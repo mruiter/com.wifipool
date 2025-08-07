@@ -2,6 +2,7 @@
   "name": { "en": "WiFi Pool" },
   "class": "sensor",
   "capabilities": ["measure_ph", "measure_water.flow", "measure_redox"],
+  "pair": "list_devices",
   "settings": [
     {
       "id": "domain",

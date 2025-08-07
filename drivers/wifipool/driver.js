@@ -22,4 +22,13 @@ module.exports = class WiFiPoolDriver extends Driver {
       this.error('WiFi Pool login failed', err);
     }
   }
+
+  async onPairListDevices() {
+    return [
+      {
+        name: 'WiFi Pool',
+        data: { id: 'wifipool' }
+      }
+    ];
+  }
 };
