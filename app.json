@@ -48,7 +48,7 @@
       "class": "sensor",
       "capabilities": [
         "measure_ph",
-        "wifi_measure_flow",
+        "measure_flow",
         "measure_redox"
       ],
       "settings": [
