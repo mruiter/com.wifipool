@@ -1,0 +1,8 @@
+{
+  "type": "number",
+  "title": { "en": "Redox" },
+  "units": { "en": "mV" },
+  "decimals": 0,
+  "getable": true,
+  "setable": false
+}

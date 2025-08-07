@@ -1,0 +1,17 @@
+{
+  "name": { "en": "WiFi Pool" },
+  "class": "sensor",
+  "capabilities": ["measure_ph", "wifi_measure_flow", "measure_redox"],
+  "settings": [
+    {
+      "id": "domain",
+      "type": "text",
+      "title": { "en": "Domain" }
+    },
+    {
+      "id": "io",
+      "type": "number",
+      "title": { "en": "IO" }
+    }
+  ]
+}

@@ -1,0 +1,41 @@
+{
+  "id": "com.wifipool",
+  "sdk": 3,
+  "platforms": [
+    "local"
+  ],
+  "name": {
+    "en": "WiFi Pool"
+  },
+  "description": {
+    "en": "Homey app for WiFi Pool sensors"
+  },
+    "category": [
+    "appliances"
+  ],
+  "permissions": [],
+   "images": {
+   "small": "/assets/images/small.png",
+   "large": "/assets/images/large.png",
+   "xlarge": "/assets/images/xlarge.png"
+  },
+  "version": "1.0.0",
+  "compatibility": ">=12.2.0",
+  "author": "WiFi Pool Team",
+  "settings": [
+    {
+      "id": "email",
+      "type": "text",
+      "title": {
+        "en": "Email"
+      }
+    },
+    {
+      "id": "password",
+      "type": "password",
+      "title": {
+        "en": "Password"
+      }
+    }
+  ]
+}

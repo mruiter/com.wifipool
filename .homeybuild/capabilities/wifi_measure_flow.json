@@ -1,0 +1,11 @@
+{
+  "type": "number",
+  "title": { "en": "Flow" },
+  "units": { "en": "L/h" },
+  "uiComponent": "sensor",
+  "chartType": "line",
+  "decimals": 1,
+  "getable": true,
+  "setable": false,
+  "min": 0
+}

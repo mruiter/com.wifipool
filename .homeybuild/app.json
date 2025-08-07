@@ -1,0 +1,79 @@
+{
+  "_comment": "This file is generated. Please edit .homeycompose/app.json instead.",
+  "id": "com.wifipool",
+  "sdk": 3,
+  "platforms": [
+    "local"
+  ],
+  "name": {
+    "en": "WiFi Pool"
+  },
+  "description": {
+    "en": "Homey app for WiFi Pool sensors"
+  },
+  "category": [
+    "appliances"
+  ],
+  "permissions": [],
+  "images": {
+    "small": "/assets/images/small.png",
+    "large": "/assets/images/large.png",
+    "xlarge": "/assets/images/xlarge.png"
+  },
+  "version": "1.0.0",
+  "compatibility": ">=12.2.0",
+  "author": "WiFi Pool Team",
+  "settings": [
+    {
+      "id": "email",
+      "type": "text",
+      "title": {
+        "en": "Email"
+      }
+    },
+    {
+      "id": "password",
+      "type": "password",
+      "title": {
+        "en": "Password"
+      }
+    }
+  ],
+  "esm": true,
+  "drivers": [
+    {
+      "name": {
+        "en": "WiFi Pool"
+      },
+      "class": "sensor",
+      "capabilities": [
+        "measure_ph",
+        "wifi_measure_flow",
+        "measure_redox"
+      ],
+      "settings": [
+        {
+          "id": "domain",
+          "type": "text",
+          "label": {
+            "en": "Domain"
+          },
+          "hint": {
+            "en": "IP or hostname of the pool system"
+          }
+        },
+        {
+          "id": "io",
+          "type": "number",
+          "label": {
+            "en": "IO Channel"
+          },
+          "hint": {
+            "en": "The IO index for this sensor"
+          }
+        }
+      ],
+      "id": "wifipool"
+    }
+  ]
+}

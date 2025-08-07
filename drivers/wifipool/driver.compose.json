@@ -1,0 +1,19 @@
+{
+  "name": { "en": "WiFi Pool" },
+  "class": "sensor",
+  "capabilities": ["measure_ph", "wifi_measure_flow", "measure_redox"],
+  "settings": [
+    {
+      "id": "domain",
+      "type": "text",
+      "label": { "en": "Domain" },
+      "hint": { "en": "IP or hostname of the pool system" }
+    },
+    {
+      "id": "io",
+      "type": "number",
+      "label": { "en": "IO Channel" },
+      "hint": { "en": "The IO index for this sensor" }
+    }
+  ]
+}
