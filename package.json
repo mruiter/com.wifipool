@@ -1,9 +1,12 @@
 {
   "name": "wifi-pool-homey",
   "version": "0.1.0",
-  "type": "module",
-  "description": "Homey app skeleton for WiFi Pool sensors",
-  "scripts": {
-    "test": "node test.js"
+  "description": "Homey app for WiFi Pool sensors",
+  "main": "app.js",
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "node-fetch": "^2.7.0"
   }
 }

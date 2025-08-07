@@ -1,9 +1,0 @@
-{
-  "name": "wifi-pool-homey",
-  "version": "0.1.0",
-  "type": "module",
-  "description": "Homey app skeleton for WiFi Pool sensors",
-  "scripts": {
-    "test": "node test.js"
-  }
-}

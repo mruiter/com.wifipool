@@ -1,7 +1,7 @@
-import { Driver } from 'homey';
-import { login } from '../../lib/wifipool.js';
+const { Driver } = require('homey');
+const { login } = require('../../lib/wifipool.js');
 
-export default class WiFiPoolDriver extends Driver {
+module.exports = class WiFiPoolDriver extends Driver {
   async onInit() {
     this.log('WiFi Pool driver initialized');
 
@@ -22,4 +22,4 @@ export default class WiFiPoolDriver extends Driver {
       this.error('WiFi Pool login failed', err);
     }
   }
-}
+};
