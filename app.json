@@ -75,5 +75,24 @@
       ],
       "id": "wifipool"
     }
-  ]
+  ],
+ "capabilities": {
+    "measure_redox": {
+      "title": {
+        "en": "Redox",
+        "nl": "Redox"
+      },
+      "type": "number",
+      "uiComponent": "sensor",
+      "units": {
+        "en": "mV",
+        "nl": "mV"
+      },
+      "icon": "/assets/redox.svg",
+      "getable": true,
+      "setable": false,
+      "insightType": "number",
+      "chartType": "line"
+    }
+ }
 }
