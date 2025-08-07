@@ -48,7 +48,7 @@
       "class": "sensor",
       "capabilities": [
         "measure_ph",
-        "measure_flow",
+        "measure_water.flow",
         "measure_redox"
       ],
       "settings": [
