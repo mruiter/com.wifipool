@@ -7,7 +7,7 @@ const {
 
 const CAPABILITIES = [
   { id: 'measure_ph', key: '4' },
-  { id: 'measure_water.flow', key: '5' },
+  { id: 'measure_water_flow', key: '5' },
   { id: 'measure_redox', key: '6' }
 ];
 

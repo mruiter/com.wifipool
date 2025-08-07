@@ -16,9 +16,9 @@
   ],
   "permissions": [],
   "images": {
-    "small": "/assets/images/small.png",
-    "large": "/assets/images/large.png",
-    "xlarge": "/assets/images/xlarge.png"
+    "small": "/assets/icon.svg",
+    "large": "/assets/icon.svg",
+    "xlarge": "/assets/icon.svg"
   },
   "version": "1.0.0",
   "compatibility": ">=12.2.0",
@@ -45,11 +45,11 @@
         "en": "WiFi Pool"
       },
       "class": "sensor",
-      "capabilities": [
-        "measure_ph",
-        "measure_water.flow",
-        "measure_redox"
-      ],
+        "capabilities": [
+          "measure_ph",
+          "measure_water_flow",
+          "measure_redox"
+        ],
       "settings": [
         {
           "id": "domain",
@@ -75,7 +75,36 @@
       "id": "wifipool"
     }
   ],
- "capabilities": {
+  "capabilities": {
+    "measure_ph": {
+      "title": {
+        "en": "pH"
+      },
+      "type": "number",
+      "units": {
+        "en": "pH"
+      },
+      "decimals": 2,
+      "getable": true,
+      "setable": false,
+      "min": 0,
+      "max": 14
+    },
+    "measure_water_flow": {
+      "title": {
+        "en": "Flow"
+      },
+      "type": "number",
+      "units": {
+        "en": "L/h"
+      },
+      "uiComponent": "sensor",
+      "chartType": "line",
+      "decimals": 2,
+      "getable": true,
+      "setable": false,
+      "min": 0
+    },
     "measure_redox": {
       "title": {
         "en": "Redox",
@@ -93,5 +122,5 @@
       "insightType": "number",
       "chartType": "line"
     }
- }
+  }
 }
