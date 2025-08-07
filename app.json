@@ -39,7 +39,6 @@
       }
     }
   ],
-  "esm": true,
   "drivers": [
     {
       "name": {
