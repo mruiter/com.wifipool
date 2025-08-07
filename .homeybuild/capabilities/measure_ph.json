@@ -1,0 +1,10 @@
+{
+  "type": "number",
+  "title": { "en": "pH" },
+  "units": { "en": "pH" },
+  "decimals": 2,
+  "getable": true,
+  "setable": false,
+  "min": 0,
+  "max": 14
+}
