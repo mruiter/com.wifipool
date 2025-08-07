@@ -1,0 +1,15 @@
+{
+  "type": "number",
+  "title": {
+    "en": "Redox",
+    "nl": "Redox"
+  },
+  "units": {
+    "en": "mV",
+    "nl": "mV"
+  },
+  "getable": true,
+  "setable": false,
+  "decimals": 0,
+  "chartType": "line"
+}
