@@ -3,7 +3,7 @@ import { getStats, extractLatestValue, getCookies } from '../../lib/wifipool.js'
 
 const CAPABILITIES = [
   { id: 'measure_ph', key: '4' },
-  { id: 'wifi_measure_flow', key: '5' },
+  { id: 'measure_flow', key: '5' },
   { id: 'measure_redox', key: '6' }
 ];
 

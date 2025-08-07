@@ -2,7 +2,7 @@
   "type": "number",
   "title": { "en": "Redox" },
   "units": { "en": "mV" },
-  "decimals": 0,
+  "decimals": 2,
   "getable": true,
   "setable": false
 }
