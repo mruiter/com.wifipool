@@ -27,5 +27,10 @@
       "type": "number",
       "title": { "en": "IO" }
     }
-  ]
+  ],
+    "images": {
+    "xlarge": "/drivers/wifipool/assets/images/xlarge.jpg",
+	"large": "/drivers/wifipool/assets/images/large.jpg",
+    "small": "/drivers/wifipool/assets/images/small.jpg"
+  }
 }

@@ -3,6 +3,7 @@
   "id": "com.wifipool",
   "sdk": 3,
   "platforms": ["local","cloud"],
+  "brandColor": "#0000FF",
   "name": {
     "en": "WiFi Pool"
   },
@@ -42,6 +43,12 @@
       "name": {
         "en": "WiFi Pool"
       },
+	  "platforms": [
+        "local"
+      ],
+      "connectivity": [
+        "lan" , "cloud"
+      ],
       "class": "sensor",
         "capabilities": [
           "measure_ph",
@@ -70,7 +77,12 @@
           }
         }
       ],
-      "id": "wifipool"
+      "id": "wifipool",
+	  "images": {
+		"xlarge": "/drivers/wifipool/assets/images/xlarge.jpg",
+		"large": "/drivers/wifipool/assets/images/large.jpg",
+		"small": "/drivers/wifipool/assets/images/small.jpg"
+		}
     }
   ],
   "capabilities": {
