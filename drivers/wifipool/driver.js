@@ -16,11 +16,11 @@ class WiFiPoolDriver extends Driver {
     }
 
     try {
-      await login(email, password);
+      const { domain } = await login(email, password);
       this.log('WiFi Pool login successful');
 
       try {
-        const devices = await getDevices();
+        const devices = await getDevices(domain);
         this.log('WiFi Pool available devices', devices);
       } catch (err) {
         this.error('Failed to fetch WiFi Pool devices', err);
