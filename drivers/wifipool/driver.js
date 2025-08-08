@@ -13,7 +13,10 @@ class WiFiPoolDriver extends Driver {
 
     if (email && password) {
       try {
-        await login(email, password, ip);
+        const { sensors } = await login(email, password, ip);
+        if (Array.isArray(sensors) && sensors.length) {
+          this.log('Initial login sensors', sensors);
+        }
       } catch (err) {
         this.error('Initial login failed', err.message || err);
       }
@@ -32,7 +35,10 @@ class WiFiPoolDriver extends Driver {
     }
 
     try {
-      const { domain } = await login(email, password, ip);
+      const { domain, sensors } = await login(email, password, ip);
+      if (Array.isArray(sensors) && sensors.length) {
+        this.log('Pairing sensors', sensors);
+      }
       const devices = [
         {
           name: 'WiFi Pool Sensor',
