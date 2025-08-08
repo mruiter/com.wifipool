@@ -55,4 +55,4 @@ class WiFiPoolDevice extends Device {
   }
 };
 
-module.exports = WifiPoolDevice;
+module.exports = WiFiPoolDevice;
