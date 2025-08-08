@@ -1,5 +1,7 @@
 {
   "name": { "en": "WiFi Pool" },
+  "id": "wifipool",
+  "platforms": ["local","cloud"],
   "class": "sensor",
   "capabilities": ["measure_ph", "measure_water_flow", "measure_redox"],
   "pair": [

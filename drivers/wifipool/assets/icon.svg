@@ -1,0 +1,11 @@
+<svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" fill="black">
+  <!-- Button frame -->
+  <rect x="5" y="5" width="190" height="190" rx="10" ry="10" stroke="black" fill="none" stroke-width="4"/>
+
+  <!-- WiFi arcs (shifted upward for balance) -->
+  <path d="M100 45c-26 0-48 10-65 27l10 10c14-14 33-23 55-23s41 9 55 23l10-10c-17-17-39-27-65-27z"/>
+  <path d="M100 85c-14 0-27 6-36 15l10 10c6-6 15-10 26-10s20 4 26 10l10-10c-9-9-22-15-36-15z"/>
+
+  <!-- Water drop (point down, centered overall) -->
+  <path d="M100 120c8 10 16 22 16 30a16 16 0 1 1 -32 0c0-8 8-20 16-30z"/>
+</svg>
