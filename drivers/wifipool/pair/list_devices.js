@@ -1,26 +1,37 @@
+function publishLog(...args) {
+  console.log(...args);
+  const logEl = document.getElementById('log');
+  if (logEl) {
+    const msg = args
+      .map(a => (typeof a === 'object' ? JSON.stringify(a) : String(a)))
+      .join(' ');
+    logEl.textContent += `${msg}\n`;
+  }
+}
+
 Homey.on('init', () => {
-  console.log('Pairing: view initialized, requesting device list');
+  publishLog('Pairing: view initialized, requesting device list');
   Homey.emit('list_devices', {}, (err, devices) => {
     if (err) {
-      console.error('Pairing: error retrieving devices', err);
+      publishLog('Pairing: error retrieving devices', err);
       return Homey.alert(err);
     }
 
-    console.log('Pairing: received devices', devices);
+    publishLog('Pairing: received devices', devices);
     const list = document.getElementById('devices');
     devices.forEach(device => {
       const li = document.createElement('li');
       const btn = document.createElement('button');
       btn.textContent = device.name;
       btn.addEventListener('click', () => {
-        console.log('Pairing: creating device', device);
+        publishLog('Pairing: creating device', device);
         Homey.createDevice(device, (createErr) => {
           if (createErr) {
-            console.error('Pairing: error creating device', createErr);
+            publishLog('Pairing: error creating device', createErr);
             return Homey.alert(createErr);
           }
 
-          console.log('Pairing: device created successfully');
+          publishLog('Pairing: device created successfully');
         });
       });
       li.appendChild(btn);
