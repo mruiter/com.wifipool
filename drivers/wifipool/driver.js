@@ -6,6 +6,18 @@ const { login } = require('../../lib/wifipool.js');
 class WiFiPoolDriver extends Driver {
   async onInit() {
     this.log('WiFi Pool driver initialized');
+
+    const email = this.homey.settings.get('email');
+    const password = this.homey.settings.get('password');
+    const ip = this.homey.settings.get('api_ip');
+
+    if (email && password) {
+      try {
+        await login(email, password, ip);
+      } catch (err) {
+        this.error('Initial login failed', err.message || err);
+      }
+    }
   }
 
   async onPairListDevices() {
