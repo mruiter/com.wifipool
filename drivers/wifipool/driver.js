@@ -1,11 +1,12 @@
 'use strict';
 
 const { Driver } = require('homey');
-const { login } = require('../../lib/wifipool.js');
+const { login, setLogger } = require('../../lib/wifipool.js');
 
 class WiFiPoolDriver extends Driver {
   async onInit() {
     this.log('WiFi Pool driver initialized');
+    setLogger(this.log.bind(this));
 
     const email = this.homey.settings.get('email');
     const password = this.homey.settings.get('password');
@@ -13,7 +14,8 @@ class WiFiPoolDriver extends Driver {
 
     if (email && password) {
       try {
-        await login(email, password, ip);
+        const { sensors } = await login(email, password, ip);
+        this.log('Initial login sensors', sensors);
       } catch (err) {
         this.error('Initial login failed', err.message || err);
       }
@@ -32,7 +34,8 @@ class WiFiPoolDriver extends Driver {
     }
 
     try {
-      const { domain } = await login(email, password, ip);
+      const { domain, sensors } = await login(email, password, ip);
+      this.log('Pairing sensors', sensors);
       const devices = [
         {
           name: 'WiFi Pool Sensor',
