@@ -39,16 +39,6 @@
       "hint": {
         "en": "IP or hostname of the pool system"
       }
-    },
-    {
-      "id": "io",
-      "type": "number",
-      "label": {
-        "en": "IO Channel"
-      },
-      "hint": {
-        "en": "The IO index for this sensor"
-      }
     }
   ],
   "images": {
