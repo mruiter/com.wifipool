@@ -24,13 +24,23 @@ class WiFiPoolDriver extends Driver {
   }
 
   async onPairListDevices() {
-    return [
-      {
-        name: 'WiFi Pool Sensor',
-        data: { id: 'wifipool-1' }, // unieke ID binnen jouw app
-        settings: { domain: '', io: 0 },
-      },
-    ];
+    this.log('Pairing: listing available devices');
+
+    try {
+      const devices = [
+        {
+          name: 'WiFi Pool Sensor',
+          data: { id: 'wifipool-1' }, // unieke ID binnen jouw app
+          settings: { domain: '', io: 0 },
+        },
+      ];
+
+      this.log('Pairing: found', devices.length, 'device(s)');
+      return devices;
+    } catch (err) {
+      this.error('Pairing: failed to list devices', err);
+      throw err;
+    }
   }
 }
 
