@@ -13,13 +13,14 @@ class WiFiPoolDriver extends Driver {
 
     const email = this.homey.settings.get('email');
     const password = this.homey.settings.get('password');
+    const ip = this.homey.settings.get('api_ip');
 
     if (!email || !password) {
       throw new Error('Configure email and password in the app settings.');
     }
 
     try {
-      const { domain } = await login(email, password);
+      const { domain } = await login(email, password, ip);
       const devices = [
         {
           name: 'WiFi Pool Sensor',

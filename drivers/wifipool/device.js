@@ -31,6 +31,7 @@ class WiFiPoolDevice extends Device {
   async updateSensors() {
     const email = this.homey.settings.get('email');
     const password = this.homey.settings.get('password');
+    const ip = this.homey.settings.get('api_ip');
 
     if (!email || !password) {
       this.error('WiFi Pool credentials missing. Please configure them in the app settings.');
@@ -38,19 +39,19 @@ class WiFiPoolDevice extends Device {
     }
 
     try {
-      const { cookies, domain: loginDomain } = await login(email, password);
+      const { cookies, domain: loginDomain } = await login(email, password, ip);
       const domain = this.getSettings().domain || loginDomain;
 
-      await this.updatePh(domain, cookies);
-      await this.updateFlow(domain, cookies);
-      await this.updateRedox(domain, cookies);
+      await this.updatePh(domain, cookies, ip);
+      await this.updateFlow(domain, cookies, ip);
+      await this.updateRedox(domain, cookies, ip);
     } catch (err) {
       this.error('Failed to update sensors:', err.message || err);
     }
   }
 
-  async updatePh(domain, cookies) {
-    const data = await getStats(domain, IO_PH, cookies);
+  async updatePh(domain, cookies, ip) {
+    const data = await getStats(domain, IO_PH, cookies, ip);
     const value = extractAnalog(data, '4');
     if (value !== null) {
       this.log('Received pH value', value);
@@ -58,8 +59,8 @@ class WiFiPoolDevice extends Device {
     }
   }
 
-  async updateFlow(domain, cookies) {
-    const data = await getStats(domain, IO_FLOW, cookies);
+  async updateFlow(domain, cookies, ip) {
+    const data = await getStats(domain, IO_FLOW, cookies, ip);
     const value = extractSwitch(data, '1');
     if (value !== null) {
       this.log('Received flow value', value);
@@ -67,8 +68,8 @@ class WiFiPoolDevice extends Device {
     }
   }
 
-  async updateRedox(domain, cookies) {
-    const data = await getStats(domain, IO_REDOX, cookies);
+  async updateRedox(domain, cookies, ip) {
+    const data = await getStats(domain, IO_REDOX, cookies, ip);
     const value = extractAnalog(data, '1');
     if (value !== null) {
       this.log('Received redox value', value);
