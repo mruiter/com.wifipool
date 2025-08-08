@@ -53,6 +53,7 @@ class WiFiPoolDevice extends Device {
     const data = await getStats(domain, IO_PH, cookies);
     const value = extractAnalog(data, '4');
     if (value !== null) {
+      this.log('Received pH value', value);
       await this.setCapabilityValue('measure_ph', value);
     }
   }
@@ -61,6 +62,7 @@ class WiFiPoolDevice extends Device {
     const data = await getStats(domain, IO_FLOW, cookies);
     const value = extractSwitch(data, '1');
     if (value !== null) {
+      this.log('Received flow value', value);
       await this.setCapabilityValue('measure_water_flow', value);
     }
   }
@@ -69,6 +71,7 @@ class WiFiPoolDevice extends Device {
     const data = await getStats(domain, IO_REDOX, cookies);
     const value = extractAnalog(data, '1');
     if (value !== null) {
+      this.log('Received redox value', value);
       await this.setCapabilityValue('measure_redox', value);
     }
   }
