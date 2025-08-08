@@ -1,27 +1,33 @@
-function onHomeyReady(Homey) {
+async function onHomeyReady(Homey) {
   window.Homey = Homey;
 
   const emailField = document.getElementById('email');
   const passwordField = document.getElementById('password');
   const form = document.getElementById('credentials-form');
 
-  Homey.get('email', (err, value) => {
-    if (!err && value) emailField.value = value;
-  });
+  try {
+    const email = await Homey.get('email');
+    if (email) emailField.value = email;
+  } catch (err) {
+    // Ignore missing email setting
+  }
 
-  Homey.get('password', (err, value) => {
-    if (!err && value) passwordField.value = value;
-  });
+  try {
+    const password = await Homey.get('password');
+    if (password) passwordField.value = password;
+  } catch (err) {
+    // Ignore missing password setting
+  }
 
-  form.addEventListener('submit', (e) => {
+  form.addEventListener('submit', async (e) => {
     e.preventDefault();
-    Homey.set('email', emailField.value, (err) => {
-      if (err) return Homey.alert(err.message || err.toString());
-      Homey.set('password', passwordField.value, (err2) => {
-        if (err2) return Homey.alert(err2.message || err2.toString());
-        Homey.alert('Settings saved');
-      });
-    });
+    try {
+      await Homey.set('email', emailField.value);
+      await Homey.set('password', passwordField.value);
+      Homey.alert('Settings saved');
+    } catch (err) {
+      Homey.alert(err.message || err.toString());
+    }
   });
 
   Homey.ready();
