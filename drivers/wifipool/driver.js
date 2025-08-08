@@ -1,7 +1,9 @@
+'use strict';
+
 const { Driver } = require('homey');
 const { login } = require('../../lib/wifipool.js');
 
-module.exports = class WiFiPoolDriver extends Driver {
+class WiFiPoolDriver extends Driver {
   async onInit() {
     this.log('WiFi Pool driver initialized');
 
@@ -9,9 +11,7 @@ module.exports = class WiFiPoolDriver extends Driver {
     const password = this.homey.settings.get('password');
 
     if (!email || !password) {
-      this.error(
-        'WiFi Pool credentials missing. Please configure email and password in the app settings.'
-      );
+      this.error('WiFi Pool credentials missing. Please configure email and password in the app settings.');
       return;
     }
 
@@ -26,9 +26,12 @@ module.exports = class WiFiPoolDriver extends Driver {
   async onPairListDevices() {
     return [
       {
-        name: 'WiFi Pool',
-        data: { id: 'wifipool' }
-      }
+        name: 'WiFi Pool Sensor',
+        data: { id: 'wifipool-1' }, // unieke ID binnen jouw app
+        settings: { domain: '', io: 0 },
+      },
     ];
   }
-};
+}
+
+module.exports = WiFiPoolDriver;

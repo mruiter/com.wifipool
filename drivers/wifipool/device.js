@@ -1,3 +1,5 @@
+'use strict';
+
 const { Device } = require('homey');
 const {
   getStats,
@@ -11,7 +13,7 @@ const CAPABILITIES = [
   { id: 'measure_redox', key: '6' }
 ];
 
-module.exports = class WiFiPoolDevice extends Device {
+class WiFiPoolDevice extends Device {
   async onInit() {
     this.log('WiFi Pool device initialized');
 
@@ -52,3 +54,5 @@ module.exports = class WiFiPoolDevice extends Device {
     }
   }
 };
+
+module.exports = WifiPoolDevice;

@@ -2,7 +2,13 @@
   "name": { "en": "WiFi Pool" },
   "id": "wifipool",
   "platforms": ["local","cloud"],
+  "connectivity": ["lan", "cloud"],
   "class": "sensor",
+  "images": {
+    "xlarge": "/drivers/wifipool/assets/images/xlarge.jpg",
+	"large": "/drivers/wifipool/assets/images/large.jpg",
+    "small": "/drivers/wifipool/assets/images/small.jpg"
+  }
   "capabilities": ["measure_ph", "measure_water_flow", "measure_redox"],
   "pair": [
     {
@@ -27,10 +33,5 @@
       "type": "number",
       "title": { "en": "IO" }
     }
-  ],
-    "images": {
-    "xlarge": "/drivers/wifipool/assets/images/xlarge.jpg",
-	"large": "/drivers/wifipool/assets/images/large.jpg",
-    "small": "/drivers/wifipool/assets/images/small.jpg"
-  }
+  ]
 }
