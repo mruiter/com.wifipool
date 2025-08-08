@@ -2,57 +2,77 @@
 
 const { Device } = require('homey');
 const {
+  login,
   getStats,
-  extractLatestValue,
-  getCookies
+  extractAnalog,
+  extractSwitch,
 } = require('../../lib/wifipool.js');
 
-const CAPABILITIES = [
-  { id: 'measure_ph', key: '4' },
-  { id: 'measure_water_flow', key: '5' },
-  { id: 'measure_redox', key: '6' }
-];
+// IO identifiers taken from the Home Assistant integration
+const IO_PH = 'e61d476d-bbd0-4527-a9f5-ef0170caa33c.o3';
+const IO_FLOW = 'e61d476d-bbd0-4527-a9f5-ef0170caa33c.o0';
+const IO_REDOX = 'e61d476d-bbd0-4527-a9f5-ef0170caa33c.o4';
 
 class WiFiPoolDevice extends Device {
   async onInit() {
     this.log('WiFi Pool device initialized');
 
-    // Voeg capabilities toe als ze nog niet aanwezig zijn
-    for (const { id } of CAPABILITIES) {
+    const capabilities = ['measure_ph', 'measure_water_flow', 'measure_redox'];
+    for (const id of capabilities) {
       if (!this.hasCapability(id)) {
         await this.addCapability(id);
       }
     }
 
-    // Initiele sensorupdate
     await this.updateSensors();
-
-    // Herhaal elke 60 seconden
     this.setInterval(() => this.updateSensors(), 60 * 1000);
   }
 
   async updateSensors() {
-    const { domain, io } = this.getSettings();
-    const cookies = getCookies();
+    const email = this.homey.settings.get('email');
+    const password = this.homey.settings.get('password');
 
-    if (!cookies) {
-      this.error('No WiFi Pool authentication cookies available');
+    if (!email || !password) {
+      this.error('WiFi Pool credentials missing. Please configure them in the app settings.');
       return;
     }
 
     try {
-      const data = await getStats(domain, io, cookies);
+      const { cookies, domain: loginDomain } = await login(email, password);
+      const domain = this.getSettings().domain || loginDomain;
 
-      for (const { id, key } of CAPABILITIES) {
-        const value = extractLatestValue(data, key);
-        if (value !== null) {
-          await this.setCapabilityValue(id, value);
-        }
-      }
+      await this.updatePh(domain, cookies);
+      await this.updateFlow(domain, cookies);
+      await this.updateRedox(domain, cookies);
     } catch (err) {
       this.error('Failed to update sensors:', err.message || err);
     }
   }
-};
+
+  async updatePh(domain, cookies) {
+    const data = await getStats(domain, IO_PH, cookies);
+    const value = extractAnalog(data, '4');
+    if (value !== null) {
+      await this.setCapabilityValue('measure_ph', value);
+    }
+  }
+
+  async updateFlow(domain, cookies) {
+    const data = await getStats(domain, IO_FLOW, cookies);
+    const value = extractSwitch(data, '1');
+    if (value !== null) {
+      await this.setCapabilityValue('measure_water_flow', value);
+    }
+  }
+
+  async updateRedox(domain, cookies) {
+    const data = await getStats(domain, IO_REDOX, cookies);
+    const value = extractAnalog(data, '1');
+    if (value !== null) {
+      await this.setCapabilityValue('measure_redox', value);
+    }
+  }
+}
 
 module.exports = WiFiPoolDevice;
+
