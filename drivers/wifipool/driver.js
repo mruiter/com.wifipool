@@ -1,7 +1,7 @@
 'use strict';
 
 const { Driver } = require('homey');
-const { login } = require('../../lib/wifipool.js');
+const { login, getDevices } = require('../../lib/wifipool.js');
 
 class WiFiPoolDriver extends Driver {
   async onInit() {
@@ -18,6 +18,13 @@ class WiFiPoolDriver extends Driver {
     try {
       await login(email, password);
       this.log('WiFi Pool login successful');
+
+      try {
+        const devices = await getDevices();
+        this.log('WiFi Pool available devices', devices);
+      } catch (err) {
+        this.error('Failed to fetch WiFi Pool devices', err);
+      }
     } catch (err) {
       this.error('WiFi Pool login failed', err);
     }
