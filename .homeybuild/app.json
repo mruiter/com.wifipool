@@ -10,9 +10,6 @@
   "category": [
     "tools"
   ],
-  "scripts": {
-    "test": "node test.js"
-  },
   "compatibility": ">=12.0.1",
   "sdk": 3,
   "brandColor": "#0b5ea8",
@@ -26,7 +23,8 @@
     "small": "/assets/images/small.png"
   },
   "permissions": [
-    "homey:app:com.wifipool"
+    "homey:manager:api",
+	"homey:app:com.wifipool"
   ],
   "api": {
     "autoSetup": {

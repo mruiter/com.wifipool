@@ -9,7 +9,7 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const ROOT = path.resolve(__dirname, '..');
+const ROOT = __dirname;
 
 const errors = [];
 const warns  = [];
@@ -43,7 +43,8 @@ async function checkAppJson() {
 
     // Basic presence
     assert.ok(app && typeof app === 'object', 'app.json should be a JSON object');
-    assert.ok(Array.isArray(app.api), 'app.json must have an "api" array');
+    assert.ok(app.api && typeof app.api === 'object' && !Array.isArray(app.api),
+      'app.json must have an "api" object');
 
     // Endpoints we expect
     const required = [
@@ -53,12 +54,10 @@ async function checkAppJson() {
     ];
 
     for (const r of required) {
-      const hit = app.api.find(x =>
-        x.id === r.id &&
-        x.path === r.path &&
-        String(x.method || '').toUpperCase() === r.method
-      );
-      if (!hit) {
+      const hit = app.api[r.id];
+      if (!hit ||
+          hit.path !== r.path ||
+          String(hit.method || '').toUpperCase() !== r.method) {
         errors.push(`app.json "api" is missing endpoint: ${r.id} ${r.method} ${r.path}`);
       }
     }
