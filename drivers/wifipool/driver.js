@@ -8,8 +8,11 @@ export default class WiFiPoolDriver extends Homey.Driver {
 
   // Built-in pairing flow ("pair": [{ "id": "list_devices" }])
   async onPairListDevices() {
+    this.log('[WiFiPool][Driver] onPairListDevices called');
     try {
-      return await this._buildDeviceList();
+      const list = await this._buildDeviceList();
+      this.log(`[WiFiPool][Driver] onPairListDevices → ${list.length} device(s)`);
+      return list;
     } catch (err) {
       this.error('[WiFiPool][Driver] onPairListDevices failed', err);
       return [];
@@ -18,23 +21,38 @@ export default class WiFiPoolDriver extends Homey.Driver {
 
   // Session-based pairing (e.g. custom pair/start.html)
   async onPair(session) {
+    this.log('[WiFiPool][Driver] onPair session started');
     // For custom UIs that call Homey.emit('list_devices')
-    session.setHandler('list_devices', async () => this._buildDeviceList());
+    session.setHandler('list_devices', async () => {
+      this.log('[WiFiPool][Driver] session.list_devices called');
+      const list = await this._buildDeviceList();
+      this.log(`[WiFiPool][Driver] session.list_devices → ${list.length} device(s)`);
+      return list;
+    });
 
     // For custom UIs that call Homey.emit('add_device')
     session.setHandler('add_device', async () => {
+      this.log('[WiFiPool][Driver] session.add_device called');
       const list = await this._buildDeviceList();
+      this.log(`[WiFiPool][Driver] session.add_device available → ${list.length}`);
       if (!list.length) {
-        throw new Error('No WiFiPool device discovered. Run Auto Setup in App Settings first.');
+        const err = new Error('No WiFiPool device discovered. Run Auto Setup in App Settings first.');
+        this.error('[WiFiPool][Driver] add_device error', err);
+        throw err;
       }
       // Return a single device-description object
+      this.log('[WiFiPool][Driver] session.add_device returning device', list[0]);
       return list[0];
     });
 
     // For the default list view, Homey may call this with the selected devices
-    session.setHandler('add_devices', async (devices) => devices);
+    session.setHandler('add_devices', async (devices) => {
+      this.log('[WiFiPool][Driver] session.add_devices called', devices);
+      return devices;
+    });
 
     session.setHandler('disconnect', async () => {
+      this.log('[WiFiPool][Driver] session disconnected');
       // optional: cleanup
     });
   }
@@ -44,6 +62,7 @@ export default class WiFiPoolDriver extends Homey.Driver {
     const domain = this.homey.settings.get('domain');
     const device_uuid = this.homey.settings.get('device_uuid');
     const io_map = this.homey.settings.get('io_map');
+    this.log('[WiFiPool][Driver] _buildDeviceList settings', { domain, device_uuid, io_map });
 
     if (!domain || !device_uuid || !io_map) {
       this.log('[WiFiPool][Driver] No auto-setup data (domain/device_uuid/io_map) yet — returning empty list');
@@ -53,13 +72,15 @@ export default class WiFiPoolDriver extends Homey.Driver {
     const name = this._makeName(io_map);
 
     // Return a single controller device. `data.id` must be unique.
-    return [{
+    const device = {
       name,
       data: { id: device_uuid },
       // Persist useful context for the device
       store: { domain, device_uuid, io_map },
       settings: {},
-    }];
+    };
+    this.log('[WiFiPool][Driver] _buildDeviceList device', device);
+    return [device];
   }
 
   _makeName(io_map) {
