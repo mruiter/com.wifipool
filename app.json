@@ -22,10 +22,7 @@
     "large": "/assets/images/large.png",
     "small": "/assets/images/small.png"
   },
-  "permissions": [
-    "homey:manager:api",
-	"homey:app:com.wifipool"
-  ],
+  "permissions": [  ],
   "api": {
     "autoSetup": {
       "method": "POST",
