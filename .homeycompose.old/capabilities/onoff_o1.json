@@ -1,0 +1,9 @@
+{
+  "type": "boolean",
+  "title": {
+    "en": "Relay o1"
+  },
+  "getable": true,
+  "setable": true,
+  "uiComponent": "toggle"
+}

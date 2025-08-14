@@ -1,0 +1,17 @@
+{
+  "id": "flow_above",
+  "title": {
+    "en": "Flow above ..."
+  },
+  "args": [
+    {
+      "name": "device",
+      "type": "device",
+      "filter": "driver_id=wifipool"
+    },
+    {
+      "name": "threshold",
+      "type": "number"
+    }
+  ]
+}

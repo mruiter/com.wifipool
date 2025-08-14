@@ -1,0 +1,17 @@
+{
+  "type": "number",
+  "title": {
+    "en": "Redox"
+  },
+  "uiComponent": "sensor",
+  "decimals": 0,
+  "min": -2000,
+  "max": 2000,
+  "units": {
+    "en": "mV"
+  },
+  "chartType": "spline",
+  "getable": true,
+  "setable": false,
+  "insights": true
+}

@@ -1,0 +1,22 @@
+{
+  "id": "health_changed",
+  "title": {
+    "en": "Health changed"
+  },
+  "args": [
+    {
+      "name": "device",
+      "type": "device",
+      "filter": "driver_id=wifipool"
+    }
+  ],
+  "tokens": [
+    {
+      "name": "alarm",
+      "type": "boolean",
+      "title": {
+        "en": "Health alarm"
+      }
+    }
+  ]
+}

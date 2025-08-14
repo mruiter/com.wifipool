@@ -1,0 +1,22 @@
+{
+  "id": "redox_updated",
+  "title": {
+    "en": "Redox updated"
+  },
+  "args": [
+    {
+      "name": "device",
+      "type": "device",
+      "filter": "driver_id=wifipool"
+    }
+  ],
+  "tokens": [
+    {
+      "name": "redox",
+      "type": "number",
+      "title": {
+        "en": "Redox (mV)"
+      }
+    }
+  ]
+}

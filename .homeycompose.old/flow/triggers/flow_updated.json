@@ -1,0 +1,22 @@
+{
+  "id": "flow_updated",
+  "title": {
+    "en": "Flow updated"
+  },
+  "args": [
+    {
+      "name": "device",
+      "type": "device",
+      "filter": "driver_id=wifipool"
+    }
+  ],
+  "tokens": [
+    {
+      "name": "flow",
+      "type": "number",
+      "title": {
+        "en": "Flow (L/min)"
+      }
+    }
+  ]
+}

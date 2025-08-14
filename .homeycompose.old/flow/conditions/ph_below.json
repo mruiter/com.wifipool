@@ -1,0 +1,17 @@
+{
+  "id": "ph_below",
+  "title": {
+    "en": "pH below ..."
+  },
+  "args": [
+    {
+      "name": "device",
+      "type": "device",
+      "filter": "driver_id=wifipool"
+    },
+    {
+      "name": "threshold",
+      "type": "number"
+    }
+  ]
+}

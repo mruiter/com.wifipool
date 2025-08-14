@@ -1,0 +1,127 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>WiFi Pool Settings</title>
+  <script src="/homey.js" data-origin="settings"></script>
+  <style>
+    body { font-family: system-ui, sans-serif; padding: 16px; }
+    label { display:block; margin-top:12px; font-weight:600; }
+    input { width:100%; padding:8px; box-sizing:border-box; }
+    .row { margin-bottom: 8px; }
+    .btns { margin-top: 16px; display:flex; gap:8px; flex-wrap: wrap; }
+    .log { margin-top:16px; background:#0b1020; color:#e0f0ff; padding:10px; border-radius:8px; height:220px; overflow:auto; font-family:monospace; font-size:12px; }
+    .hint { color:#666; font-size: 12px; }
+  </style>
+</head>
+<body>
+  <h2>WiFi Pool — Settings</h2>
+
+  <div class="row">
+    <label for="email">Email</label>
+    <input id="email" type="email" placeholder="you@example.com"/>
+  </div>
+  <div class="row">
+    <label for="password">Password</label>
+    <input id="password" type="password" placeholder="••••••••"/>
+  </div>
+  <div class="row">
+    <label for="domain">Domain</label>
+    <small class="hint">Tenant/organisatie ID (meestal UUID). Wordt door Auto Setup gezet.</small>
+    <input id="domain" type="text" placeholder="2ca59577-...-be790"/>
+  </div>
+  <div class="row">
+    <label for="device_uuid">Device UUID</label>
+    <small class="hint">Prefix vóór <code>.o0/.o3/.o4</code>. Wordt door Auto Setup gezet.</small>
+    <input id="device_uuid" type="text" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"/>
+  </div>
+  <div class="row">
+    <label for="poll">Polling interval (seconds)</label>
+    <input id="poll" type="number" min="15" step="1" placeholder="60"/>
+  </div>
+
+  <div class="btns">
+    <button id="save">Save</button>
+    <button id="reload">Reload</button>
+    <button id="testapi">Test API</button>
+    <button id="discover">Discover IOs</button>
+    <button id="autosetup">Auto Setup</button>
+  </div>
+
+  <div class="log" id="log"></div>
+
+  <script>
+    function onHomeyReady(Homey){
+      const $ = id => document.getElementById(id);
+      const log = (...m) => {
+        const el=$('log');
+        el.textContent += m.map(x => (typeof x==='string'? x : JSON.stringify(x))).join(' ') + "\n";
+        el.scrollTop = el.scrollHeight;
+      };
+
+      async function load(){
+        $('email').value       = await Homey.get('email') || '';
+        $('password').value    = await Homey.get('password') || '';
+        $('domain').value      = await Homey.get('domain') || '';
+        $('device_uuid').value = await Homey.get('device_uuid') || '';
+        $('poll').value        = await Homey.get('poll_interval') || 60;
+      }
+
+      $('save').addEventListener('click', async ()=>{
+        await Homey.set('email', $('email').value || '');
+        await Homey.set('password', $('password').value || '');
+        await Homey.set('domain', $('domain').value || '');
+        await Homey.set('device_uuid', $('device_uuid').value || '');
+        await Homey.set('poll_interval', Math.max(15, parseInt(($('poll').value || '60'),10)));
+        log('Saved settings.');
+        Homey.alert('Saved. Devices will pick up changes automatically.');
+      });
+
+      $('reload').addEventListener('click', async ()=>{
+        await load(); log('Reloaded.');
+      });
+
+      $('testapi').addEventListener('click', async ()=>{
+        const btn = $('testapi'); btn.disabled=true; btn.textContent='Testing…';
+        try {
+          const res = await Homey.api('POST','/test');
+          log('Test API:', res);
+          Homey.alert('Test API finished');
+        } catch(e) {
+          log('Test API error:', e && e.message ? e.message : e);
+          Homey.alert('Test API error');
+        } finally { btn.disabled=false; btn.textContent='Test API'; }
+      });
+
+      $('discover').addEventListener('click', async ()=>{
+        const btn = $('discover'); btn.disabled=true; btn.textContent='Discovering…';
+        try {
+          const res = await Homey.api('POST','/discover');
+          log('Discovery:', res);
+          Homey.alert('Discovery finished');
+        } catch(e) {
+          log('Discovery error:', e && e.message ? e.message : e);
+          Homey.alert('Discovery error');
+        } finally { btn.disabled=false; btn.textContent='Discover IOs'; }
+      });
+
+      $('autosetup').addEventListener('click', async ()=>{
+        const btn = $('autosetup'); btn.disabled=true; btn.textContent='Running…';
+        try {
+          const res = await Homey.api('POST','/autosetup');
+          log('Auto-setup:', res);
+          if (res && res.domain)      $('domain').value = res.domain;
+          if (res && res.deviceUuid)  $('device_uuid').value = res.deviceUuid;
+          Homey.alert('Auto-setup finished');
+        } catch(e) {
+          log('Auto-setup error:', e && e.message ? e.message : e);
+          Homey.alert('Auto-setup error');
+        } finally { btn.disabled=false; btn.textContent='Auto Setup'; }
+      });
+
+      load().finally(()=>Homey.ready());
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,9 @@
+{
+  "name": "com.wifipool",
+  "version": "1.2.0",
+  "type": "module",
+  "license": "MIT",
+  "dependencies": {
+    "node-fetch": "^3.3.2"
+  }
+}

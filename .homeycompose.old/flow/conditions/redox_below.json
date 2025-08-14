@@ -1,0 +1,17 @@
+{
+  "id": "redox_below",
+  "title": {
+    "en": "Redox below ..."
+  },
+  "args": [
+    {
+      "name": "device",
+      "type": "device",
+      "filter": "driver_id=wifipool"
+    },
+    {
+      "name": "threshold",
+      "type": "number"
+    }
+  ]
+}

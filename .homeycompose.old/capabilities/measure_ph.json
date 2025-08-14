@@ -1,0 +1,10 @@
+{
+  "type": "number",
+  "title": {
+    "en": "pH"
+  },
+  "getable": true,
+  "setable": false,
+  "uiComponent": "sensor",
+  "decimals": 2
+}

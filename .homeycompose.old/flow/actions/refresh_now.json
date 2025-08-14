@@ -1,0 +1,13 @@
+{
+  "id": "refresh_now",
+  "title": {
+    "en": "Refresh WiFi Pool now"
+  },
+  "args": [
+    {
+      "name": "device",
+      "type": "device",
+      "filter": "driver_id=wifipool"
+    }
+  ]
+}

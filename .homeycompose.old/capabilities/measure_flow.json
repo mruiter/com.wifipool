@@ -1,0 +1,13 @@
+{
+  "type": "number",
+  "units": {
+    "en": "L/min"
+  },
+  "title": {
+    "en": "Flow"
+  },
+  "getable": true,
+  "setable": false,
+  "uiComponent": "sensor",
+  "decimals": 1
+}

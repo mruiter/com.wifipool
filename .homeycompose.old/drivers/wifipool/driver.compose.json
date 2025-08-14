@@ -1,0 +1,18 @@
+{
+  "id": "wifipool",
+  "name": {
+    "en": "WiFi Pool"
+  },
+  "platforms": [
+    "local"
+  ],
+  "images": {
+    "small": "drivers/wifipool/assets/images/small.png",
+    "large": "drivers/wifipool/assets/images/large.png"
+  },
+  "pair": [
+    {
+      "id": "list_devices"
+    }
+  ]
+}
