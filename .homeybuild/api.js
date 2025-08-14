@@ -4,15 +4,20 @@
 //   - discoverIos  (POST /discover)
 //   - autoSetup    (POST /autosetup)
 //
+// app.json example:
+/*
+"api": [
+  { "id": "testApi",     "path": "/test",      "method": "POST", "public": false },
+  { "id": "discoverIos", "path": "/discover",  "method": "POST", "public": false },
+  { "id": "autoSetup",   "path": "/autosetup", "method": "POST", "public": false }
+]
+*/
 // package.json: { "type": "module", "dependencies": { "node-fetch": "^3.3.2" } }
 
 import fetch from 'node-fetch';
 
 const BASE = 'https://api.wifipool.eu/native_mobile';
 let REQ = 0;
-
-// --- limit history to recent window (tweak #1) ---
-const AFTER_WINDOW_MS = 7 * 24 * 60 * 60 * 1000; // last 7 days
 
 // ----- logging helpers -----
 function _log(homey, msg)   { homey.log(`[WiFiPool][API] ${msg}`); }
@@ -110,51 +115,43 @@ async function getGroupInfo(homey, cookie, domainId) {
   return r.json;
 }
 
-// getStats: suppresses noisy logs for 0 items (tweak #3)
-// also: auto-retry once with seconds if ms cutoff returns 0 items
-async function getStats(homey, cookie, domain, io, after = 0, _retried = false) {
+async function getStats(homey, cookie, domain, io, after = 0) {
   const r = await httpRequest(homey, 'POST', '/harmopool/getStats', {
     cookie, body: { domain, io, after },
   });
-
-  if (r.status === 404) {
-    const msg = (r.text || '').trim();
-    if (/Unknown io/i.test(msg)) {
-      _trace(homey, `skipping unknown io: ${io}`);
-      return null; // signal to caller to skip
-    }
-    _error(homey, `getStats 404: ${msg || 'Not Found'}`);
-    return null;
+  if (r.status === 404 && r.text) {
+    _error(homey, `getStats 404: ${r.text}`);
+    throw new Error(`getStats 404: ${r.text}`);
   }
-
   if (r.status !== 200) throw new Error(`getStats failed: HTTP ${r.status}`);
-
   const arr = r.json || [];
+  _trace(homey, `getStats response items: ${arr.length}`);
+  return arr;
+}
 
-  if (arr.length > 0) {
-    _trace(homey, `getStats response items: ${arr.length}`);
-    return arr;
+// Smart wrapper: try ms "after", then seconds "after". Log if still empty.
+async function getStatsWithFallback(homey, cookie, domain, io) {
+  const nowMs = Date.now();
+  let arr = await getStats(homey, cookie, domain, io, nowMs);
+  if (arr.length) return arr;
+
+  const nowSec = Math.floor(nowMs / 1000);
+  arr = await getStats(homey, cookie, domain, io, nowSec);
+  if (!arr.length) {
+    _trace(homey, `no data for ${io} after ms→sec fallback`);
   }
-
-  // If we had a cutoff and got 0 items, try seconds once as a fallback
-  if (after && !_retried) {
-    const sec = Math.floor(after / 1000);
-    if (sec > 0 && sec !== after) {
-      return await getStats(homey, cookie, domain, io, sec, true);
-    }
-  }
-
-  // No items and no retry needed
-  return [];
+  return arr;
 }
 
 // ----- UUID helpers -----
 const UUID_RE = /[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}/i;
 
+// Extract *matches* (pure UUIDs) from any string/object tree.
 function collectUuidsDeep(node, out) {
   if (!node) return;
   if (typeof node === 'string') {
-    if (UUID_RE.test(node)) out.add(node);
+    const matches = node.matchAll(/[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}/gi);
+    for (const m of matches) out.add(m[0]);
     return;
   }
   if (Array.isArray(node)) {
@@ -164,6 +161,12 @@ function collectUuidsDeep(node, out) {
   if (typeof node === 'object') {
     for (const v of Object.values(node)) collectUuidsDeep(v, out);
   }
+}
+
+function sanitizeUuidMaybe(v) {
+  if (typeof v !== 'string') return null;
+  const m = v.match(UUID_RE);
+  return m ? m[0] : null;
 }
 
 // ----- robust domain resolver -----
@@ -180,28 +183,30 @@ async function resolveDomainId(homey, cookie, loginUserId) {
   for (const g of groups) {
     const devices = g?.mobile_group_data?.devices || [];
     for (const d of devices) {
-      if (d?.id && UUID_RE.test(d.id)) deviceIds.add(d.id);
+      const sid = sanitizeUuidMaybe(d?.id);
+      if (sid) deviceIds.add(sid);
     }
   }
 
-  // Collect all UUIDs from payload
+  // Collect all pure UUIDs from payload
   const all = new Set();
   for (const g of groups) collectUuidsDeep(g, all);
 
   // Exclude user/creator & device UUIDs
   for (const g of groups) {
-    const creator = g?.mobile_group_creator;
-    if (creator && UUID_RE.test(creator)) all.delete(creator);
+    const creator = sanitizeUuidMaybe(g?.mobile_group_creator);
+    if (creator) all.delete(creator);
   }
-  if (loginUserId && UUID_RE.test(loginUserId)) all.delete(loginUserId);
+  const loginSid = sanitizeUuidMaybe(loginUserId);
+  if (loginSid) all.delete(loginSid);
   for (const id of deviceIds) all.delete(id);
 
   // Likely keys first if present
   const likely = [];
   for (const g of groups) {
     for (const k of ['mobile_group_uuid', 'mobile_group_id', 'domainId', 'groupId']) {
-      const v = g?.[k];
-      if (typeof v === 'string' && UUID_RE.test(v)) likely.push(v);
+      const sid = sanitizeUuidMaybe(g?.[k]);
+      if (sid) likely.push(sid);
     }
   }
 
@@ -210,6 +215,7 @@ async function resolveDomainId(homey, cookie, loginUserId) {
     throw new Error('Could not find any domainId candidates in groups/accessible');
   }
 
+  // 👉 Cleaned up log: only pure UUIDs
   _log(homey, `domainId candidates: ${candidates.join(', ')}`);
 
   // Probe each candidate with /groups/getInfo: choose the one that has IOs
@@ -233,7 +239,7 @@ async function resolveDomainId(homey, cookie, loginUserId) {
 // ----- data inspectors -----
 function detectFromStats(arr) {
   for (const it of arr) {
-    if (it?.device_sensor_data) {
+    if (it.device_sensor_data) {
       const d = it.device_sensor_data;
       if (d.switch) {
         const key = Object.keys(d.switch)[0];
@@ -248,7 +254,7 @@ function detectFromStats(arr) {
         return { kind: 'ds18b20', key, sample: d.ds18b20[key]?.temperature };
       }
     }
-    if (it?.device_state_data?.power) {
+    if (it.device_state_data?.power) {
       const key = Object.keys(it.device_state_data.power)[0];
       return { kind: 'state_power', key, sample: it.device_state_data.power[key] };
     }
@@ -267,21 +273,20 @@ async function autoSetupCore(homey) {
   _log(homey, `device list length = ${info?.mobile_group_data?.devices?.length ?? 0}`);
 
   // 3) get device uuid & IO map from group info
-  const device_uuid = info?.mobile_group_data?.devices?.[0]?.id;
+  const device_uuid = sanitizeUuidMaybe(info?.mobile_group_data?.devices?.[0]?.id);
   if (!device_uuid) throw new Error('Could not determine device UUID from getInfo.');
   _log(homey, `device_uuid = ${device_uuid}`);
 
-  // 4) probe IOs and categorize (tweak #2: pass recent 'after')
-  const afterCutoff = Date.now() - AFTER_WINDOW_MS;
-
+  // 4) probe IOs and categorize
   const found = { domain, device_uuid, switches: [] };
   const oCandidates = Array.from({ length: 13 }, (_, i) => `${device_uuid}.o${i}`);
   const iCandidates = Array.from({ length: 8 },  (_, i) => `${device_uuid}.i${i}`);
 
   const probe = async (io) => {
     try {
-      const arr = await getStats(homey, cookie, domain, io, afterCutoff);
-      if (!arr || !arr.length) return; // silent on 0 (tweak #3)
+      const arr = await getStatsWithFallback(homey, cookie, domain, io);
+      if (!arr.length) return;
+
       const det = detectFromStats(arr);
       if (det.kind === 'switch' || det.kind === 'state_power') {
         _trace(homey, `switch at ${io}`);
@@ -303,8 +308,12 @@ async function autoSetupCore(homey) {
         found.temperature = { io, key: det.key };
         _log(homey, `temperature (ds18b20) at ${io} key ${det.key}`);
       }
-    } catch {
-      // probing errors are non-fatal
+    } catch (e) {
+      if (String(e?.message || e).includes('getStats 404: Unknown io')) {
+        _trace(homey, `skipping unknown io: ${io}`);
+      } else {
+        _trace(homey, `probe error at ${io}: ${e?.message || e}`);
+      }
     }
   };
 
@@ -341,7 +350,7 @@ export default {
   async discoverIos({ homey }) {
     const { cookie, user } = await login(homey);
     const { domainId: domain, info } = await resolveDomainId(homey, cookie, user?.mobile_user_id);
-    const device_uuid = info?.mobile_group_data?.devices?.[0]?.id || null;
+    const device_uuid = sanitizeUuidMaybe(info?.mobile_group_data?.devices?.[0]?.id) || null;
     const io = (info?.mobile_group_data?.io || []).map(x => x.id);
     return { domain, device_uuid, io };
   },
