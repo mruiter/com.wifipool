@@ -1,5 +1,6 @@
 // drivers/wifipool/driver.js — Homey SDK v3 (ESM)
 import Homey from 'homey';
+import { autoSetupCore } from '../../api.js';
 
 export default class WiFiPoolDriver extends Homey.Driver {
   async onInit() {
@@ -59,14 +60,22 @@ export default class WiFiPoolDriver extends Homey.Driver {
 
   // ---- Build the list of pairable devices from app-level auto-setup
   async _buildDeviceList() {
-    const domain = this.homey.settings.get('domain');
-    const device_uuid = this.homey.settings.get('device_uuid');
-    const io_map = this.homey.settings.get('io_map');
+    let domain = this.homey.settings.get('domain');
+    let device_uuid = this.homey.settings.get('device_uuid');
+    let io_map = this.homey.settings.get('io_map');
     this.log('[WiFiPool][Driver] _buildDeviceList settings', { domain, device_uuid, io_map });
 
     if (!domain || !device_uuid || !io_map) {
-      this.log('[WiFiPool][Driver] No auto-setup data (domain/device_uuid/io_map) yet — returning empty list');
-      return [];
+      this.log('[WiFiPool][Driver] Missing auto-setup data, attempting autoSetupCore');
+      try {
+        const found = await autoSetupCore(this.homey);
+        domain = found.domain;
+        device_uuid = found.device_uuid;
+        io_map = found;
+      } catch (err) {
+        this.error('[WiFiPool][Driver] autoSetupCore failed', err);
+        return [];
+      }
     }
 
     const name = this._makeName(io_map);
