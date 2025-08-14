@@ -12,7 +12,7 @@
   { "id": "autoSetup",   "path": "/autosetup", "method": "POST", "public": false }
 ]
 */
-// package.json needs: { "type": "module", "dependencies": { "node-fetch": "^3.3.2" } }
+// package.json: { "type": "module", "dependencies": { "node-fetch": "^3.3.2" } }
 
 import fetch from 'node-fetch';
 
@@ -111,7 +111,7 @@ async function getAccessibleGroups(homey, cookie) {
 
 async function getGroupInfo(homey, cookie, domainId) {
   const r = await httpRequest(homey, 'POST', '/groups/getInfo', { cookie, body: { domainId } });
-  if (r.status !== 200 || !r.json) throw new Error(`groups/getInfo failed: HTTP ${r.status}`);
+  if (r.status !== 200 || !r.json) throw new Error(`groups/getInfo failed: HTTP ${r.status}${r.text ? `: ${r.text}` : ''}`);
   return r.json;
 }
 
@@ -129,24 +129,114 @@ async function getStats(homey, cookie, domain, io, after = 0) {
   return arr;
 }
 
-// ----- discovery helpers -----
-function firstUuidDeep(obj) {
-  const re = /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i;
-  let found = null;
-  (function walk(x) {
-    if (found || x == null) return;
-    if (typeof x === 'string') {
-      const m = x.match(re);
-      if (m) { found = m[0]; return; }
-    } else if (Array.isArray(x)) {
-      for (const v of x) walk(v);
-    } else if (typeof x === 'object') {
-      for (const k of Object.keys(x)) walk(x[k]);
-    }
-  })(obj);
-  return found;
+// Smart wrapper: try ms "after", then seconds "after". Log if still empty.
+async function getStatsWithFallback(homey, cookie, domain, io) {
+  const nowMs = Date.now();
+  let arr = await getStats(homey, cookie, domain, io, nowMs);
+  if (arr.length) return arr;
+
+  const nowSec = Math.floor(nowMs / 1000);
+  arr = await getStats(homey, cookie, domain, io, nowSec);
+  if (!arr.length) {
+    _trace(homey, `no data for ${io} after ms→sec fallback`);
+  }
+  return arr;
 }
 
+// ----- UUID helpers -----
+const UUID_RE = /[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}/i;
+
+// Extract *matches* (pure UUIDs) from any string/object tree.
+function collectUuidsDeep(node, out) {
+  if (!node) return;
+  if (typeof node === 'string') {
+    const matches = node.matchAll(/[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}/gi);
+    for (const m of matches) out.add(m[0]);
+    return;
+  }
+  if (Array.isArray(node)) {
+    for (const x of node) collectUuidsDeep(x, out);
+    return;
+  }
+  if (typeof node === 'object') {
+    for (const v of Object.values(node)) collectUuidsDeep(v, out);
+  }
+}
+
+function sanitizeUuidMaybe(v) {
+  if (typeof v !== 'string') return null;
+  const m = v.match(UUID_RE);
+  return m ? m[0] : null;
+}
+
+// ----- robust domain resolver -----
+async function resolveDomainId(homey, cookie, loginUserId) {
+  const groups = await getAccessibleGroups(homey, cookie);
+  _log(homey, `groups/accessible returned ${groups?.length ?? 0} item(s)`);
+
+  if (!Array.isArray(groups) || groups.length === 0) {
+    throw new Error('No groups accessible for this account');
+  }
+
+  // Collect device UUIDs (to exclude)
+  const deviceIds = new Set();
+  for (const g of groups) {
+    const devices = g?.mobile_group_data?.devices || [];
+    for (const d of devices) {
+      const sid = sanitizeUuidMaybe(d?.id);
+      if (sid) deviceIds.add(sid);
+    }
+  }
+
+  // Collect all pure UUIDs from payload
+  const all = new Set();
+  for (const g of groups) collectUuidsDeep(g, all);
+
+  // Exclude user/creator & device UUIDs
+  for (const g of groups) {
+    const creator = sanitizeUuidMaybe(g?.mobile_group_creator);
+    if (creator) all.delete(creator);
+  }
+  const loginSid = sanitizeUuidMaybe(loginUserId);
+  if (loginSid) all.delete(loginSid);
+  for (const id of deviceIds) all.delete(id);
+
+  // Likely keys first if present
+  const likely = [];
+  for (const g of groups) {
+    for (const k of ['mobile_group_uuid', 'mobile_group_id', 'domainId', 'groupId']) {
+      const sid = sanitizeUuidMaybe(g?.[k]);
+      if (sid) likely.push(sid);
+    }
+  }
+
+  const candidates = Array.from(new Set([ ...likely, ...all ]));
+  if (candidates.length === 0) {
+    throw new Error('Could not find any domainId candidates in groups/accessible');
+  }
+
+  // 👉 Cleaned up log: only pure UUIDs
+  _log(homey, `domainId candidates: ${candidates.join(', ')}`);
+
+  // Probe each candidate with /groups/getInfo: choose the one that has IOs
+  for (const id of candidates) {
+    try {
+      const info = await getGroupInfo(homey, cookie, id);
+      const ioLen = info?.mobile_group_data?.io?.length ?? 0;
+      if (ioLen > 0) {
+        _log(homey, `domain resolved: ${id} (io=${ioLen})`);
+        return { domainId: id, info };
+      }
+      _log(homey, `candidate ${id} rejected: no io array`);
+    } catch (e) {
+      _log(homey, `candidate ${id} rejected: ${e?.message || e}`);
+    }
+  }
+
+  throw new Error('All domainId candidates were rejected by /groups/getInfo');
+}
+
+// ----- data inspectors -----
 function detectFromStats(arr) {
   for (const it of arr) {
     if (it.device_sensor_data) {
@@ -172,21 +262,18 @@ function detectFromStats(arr) {
   return { kind: null };
 }
 
+// ----- Auto-setup core flow -----
 async function autoSetupCore(homey) {
   // 1) login
-  const { cookie } = await login(homey);
+  const { cookie, user } = await login(homey);
+  const loginUserId = user?.mobile_user_id;
 
-  // 2) discover domain from groups/accessible
-  const groups = await getAccessibleGroups(homey, cookie);
-  const domain = firstUuidDeep(groups);
-  if (!domain) throw new Error('Could not determine domain automatically.');
-  _log(homey, `domain (from groups/accessible) = ${domain}`);
+  // 2) robust domain detection
+  const { domainId: domain, info } = await resolveDomainId(homey, cookie, loginUserId);
+  _log(homey, `device list length = ${info?.mobile_group_data?.devices?.length ?? 0}`);
 
-  // 3) fetch IOs & device uuid
-  const info = await getGroupInfo(homey, cookie, domain);
-  const ioList = info?.mobile_group_data?.io || [];
-  _log(homey, `IO strings found: ${ioList.length}`);
-  const device_uuid = info?.mobile_group_data?.devices?.[0]?.id;
+  // 3) get device uuid & IO map from group info
+  const device_uuid = sanitizeUuidMaybe(info?.mobile_group_data?.devices?.[0]?.id);
   if (!device_uuid) throw new Error('Could not determine device UUID from getInfo.');
   _log(homey, `device_uuid = ${device_uuid}`);
 
@@ -197,8 +284,9 @@ async function autoSetupCore(homey) {
 
   const probe = async (io) => {
     try {
-      const arr = await getStats(homey, cookie, domain, io, 0);
+      const arr = await getStatsWithFallback(homey, cookie, domain, io);
       if (!arr.length) return;
+
       const det = detectFromStats(arr);
       if (det.kind === 'switch' || det.kind === 'state_power') {
         _trace(homey, `switch at ${io}`);
@@ -220,8 +308,12 @@ async function autoSetupCore(homey) {
         found.temperature = { io, key: det.key };
         _log(homey, `temperature (ds18b20) at ${io} key ${det.key}`);
       }
-    } catch {
-      // probing errors are non-fatal
+    } catch (e) {
+      if (String(e?.message || e).includes('getStats 404: Unknown io')) {
+        _trace(homey, `skipping unknown io: ${io}`);
+      } else {
+        _trace(homey, `probe error at ${io}: ${e?.message || e}`);
+      }
     }
   };
 
@@ -244,7 +336,7 @@ async function autoSetupCore(homey) {
 
 // ----- Exported API (default export required by ManagerApi) -----
 export default {
-  // Quick connectivity check; returns minimal info
+  // Quick connectivity check
   async testApi({ homey }) {
     const { cookie, user } = await login(homey);
     return {
@@ -256,15 +348,9 @@ export default {
 
   // Return domain + device uuid + raw IO IDs (does not persist)
   async discoverIos({ homey }) {
-    const { cookie } = await login(homey);
-    let domain = homey.settings.get('domain');
-    if (!domain) {
-      const groups = await getAccessibleGroups(homey, cookie);
-      domain = firstUuidDeep(groups);
-    }
-    if (!domain) throw new Error('discoverIos: could not determine domain.');
-    const info = await getGroupInfo(homey, cookie, domain);
-    const device_uuid = info?.mobile_group_data?.devices?.[0]?.id || null;
+    const { cookie, user } = await login(homey);
+    const { domainId: domain, info } = await resolveDomainId(homey, cookie, user?.mobile_user_id);
+    const device_uuid = sanitizeUuidMaybe(info?.mobile_group_data?.devices?.[0]?.id) || null;
     const io = (info?.mobile_group_data?.io || []).map(x => x.id);
     return { domain, device_uuid, io };
   },

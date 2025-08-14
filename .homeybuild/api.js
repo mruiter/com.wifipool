@@ -4,20 +4,15 @@
 //   - discoverIos  (POST /discover)
 //   - autoSetup    (POST /autosetup)
 //
-// app.json example:
-/*
-"api": [
-  { "id": "testApi",     "path": "/test",      "method": "POST", "public": false },
-  { "id": "discoverIos", "path": "/discover",  "method": "POST", "public": false },
-  { "id": "autoSetup",   "path": "/autosetup", "method": "POST", "public": false }
-]
-*/
-// package.json needs: { "type": "module", "dependencies": { "node-fetch": "^3.3.2" } }
+// package.json: { "type": "module", "dependencies": { "node-fetch": "^3.3.2" } }
 
 import fetch from 'node-fetch';
 
 const BASE = 'https://api.wifipool.eu/native_mobile';
 let REQ = 0;
+
+// --- limit history to recent window (tweak #1) ---
+const AFTER_WINDOW_MS = 7 * 24 * 60 * 60 * 1000; // last 7 days
 
 // ----- logging helpers -----
 function _log(homey, msg)   { homey.log(`[WiFiPool][API] ${msg}`); }
@@ -111,45 +106,134 @@ async function getAccessibleGroups(homey, cookie) {
 
 async function getGroupInfo(homey, cookie, domainId) {
   const r = await httpRequest(homey, 'POST', '/groups/getInfo', { cookie, body: { domainId } });
-  if (r.status !== 200 || !r.json) throw new Error(`groups/getInfo failed: HTTP ${r.status}`);
+  if (r.status !== 200 || !r.json) throw new Error(`groups/getInfo failed: HTTP ${r.status}${r.text ? `: ${r.text}` : ''}`);
   return r.json;
 }
 
-async function getStats(homey, cookie, domain, io, after = 0) {
+// getStats: suppresses noisy logs for 0 items (tweak #3)
+// also: auto-retry once with seconds if ms cutoff returns 0 items
+async function getStats(homey, cookie, domain, io, after = 0, _retried = false) {
   const r = await httpRequest(homey, 'POST', '/harmopool/getStats', {
     cookie, body: { domain, io, after },
   });
-  if (r.status === 404 && r.text) {
-    _error(homey, `getStats 404: ${r.text}`);
-    throw new Error(`getStats 404: ${r.text}`);
-  }
-  if (r.status !== 200) throw new Error(`getStats failed: HTTP ${r.status}`);
-  const arr = r.json || [];
-  _trace(homey, `getStats response items: ${arr.length}`);
-  return arr;
-}
 
-// ----- discovery helpers -----
-function firstUuidDeep(obj) {
-  const re = /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i;
-  let found = null;
-  (function walk(x) {
-    if (found || x == null) return;
-    if (typeof x === 'string') {
-      const m = x.match(re);
-      if (m) { found = m[0]; return; }
-    } else if (Array.isArray(x)) {
-      for (const v of x) walk(v);
-    } else if (typeof x === 'object') {
-      for (const k of Object.keys(x)) walk(x[k]);
+  if (r.status === 404) {
+    const msg = (r.text || '').trim();
+    if (/Unknown io/i.test(msg)) {
+      _trace(homey, `skipping unknown io: ${io}`);
+      return null; // signal to caller to skip
     }
-  })(obj);
-  return found;
+    _error(homey, `getStats 404: ${msg || 'Not Found'}`);
+    return null;
+  }
+
+  if (r.status !== 200) throw new Error(`getStats failed: HTTP ${r.status}`);
+
+  const arr = r.json || [];
+
+  if (arr.length > 0) {
+    _trace(homey, `getStats response items: ${arr.length}`);
+    return arr;
+  }
+
+  // If we had a cutoff and got 0 items, try seconds once as a fallback
+  if (after && !_retried) {
+    const sec = Math.floor(after / 1000);
+    if (sec > 0 && sec !== after) {
+      return await getStats(homey, cookie, domain, io, sec, true);
+    }
+  }
+
+  // No items and no retry needed
+  return [];
 }
 
+// ----- UUID helpers -----
+const UUID_RE = /[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}/i;
+
+function collectUuidsDeep(node, out) {
+  if (!node) return;
+  if (typeof node === 'string') {
+    if (UUID_RE.test(node)) out.add(node);
+    return;
+  }
+  if (Array.isArray(node)) {
+    for (const x of node) collectUuidsDeep(x, out);
+    return;
+  }
+  if (typeof node === 'object') {
+    for (const v of Object.values(node)) collectUuidsDeep(v, out);
+  }
+}
+
+// ----- robust domain resolver -----
+async function resolveDomainId(homey, cookie, loginUserId) {
+  const groups = await getAccessibleGroups(homey, cookie);
+  _log(homey, `groups/accessible returned ${groups?.length ?? 0} item(s)`);
+
+  if (!Array.isArray(groups) || groups.length === 0) {
+    throw new Error('No groups accessible for this account');
+  }
+
+  // Collect device UUIDs (to exclude)
+  const deviceIds = new Set();
+  for (const g of groups) {
+    const devices = g?.mobile_group_data?.devices || [];
+    for (const d of devices) {
+      if (d?.id && UUID_RE.test(d.id)) deviceIds.add(d.id);
+    }
+  }
+
+  // Collect all UUIDs from payload
+  const all = new Set();
+  for (const g of groups) collectUuidsDeep(g, all);
+
+  // Exclude user/creator & device UUIDs
+  for (const g of groups) {
+    const creator = g?.mobile_group_creator;
+    if (creator && UUID_RE.test(creator)) all.delete(creator);
+  }
+  if (loginUserId && UUID_RE.test(loginUserId)) all.delete(loginUserId);
+  for (const id of deviceIds) all.delete(id);
+
+  // Likely keys first if present
+  const likely = [];
+  for (const g of groups) {
+    for (const k of ['mobile_group_uuid', 'mobile_group_id', 'domainId', 'groupId']) {
+      const v = g?.[k];
+      if (typeof v === 'string' && UUID_RE.test(v)) likely.push(v);
+    }
+  }
+
+  const candidates = Array.from(new Set([ ...likely, ...all ]));
+  if (candidates.length === 0) {
+    throw new Error('Could not find any domainId candidates in groups/accessible');
+  }
+
+  _log(homey, `domainId candidates: ${candidates.join(', ')}`);
+
+  // Probe each candidate with /groups/getInfo: choose the one that has IOs
+  for (const id of candidates) {
+    try {
+      const info = await getGroupInfo(homey, cookie, id);
+      const ioLen = info?.mobile_group_data?.io?.length ?? 0;
+      if (ioLen > 0) {
+        _log(homey, `domain resolved: ${id} (io=${ioLen})`);
+        return { domainId: id, info };
+      }
+      _log(homey, `candidate ${id} rejected: no io array`);
+    } catch (e) {
+      _log(homey, `candidate ${id} rejected: ${e?.message || e}`);
+    }
+  }
+
+  throw new Error('All domainId candidates were rejected by /groups/getInfo');
+}
+
+// ----- data inspectors -----
 function detectFromStats(arr) {
   for (const it of arr) {
-    if (it.device_sensor_data) {
+    if (it?.device_sensor_data) {
       const d = it.device_sensor_data;
       if (d.switch) {
         const key = Object.keys(d.switch)[0];
@@ -164,7 +248,7 @@ function detectFromStats(arr) {
         return { kind: 'ds18b20', key, sample: d.ds18b20[key]?.temperature };
       }
     }
-    if (it.device_state_data?.power) {
+    if (it?.device_state_data?.power) {
       const key = Object.keys(it.device_state_data.power)[0];
       return { kind: 'state_power', key, sample: it.device_state_data.power[key] };
     }
@@ -172,33 +256,32 @@ function detectFromStats(arr) {
   return { kind: null };
 }
 
+// ----- Auto-setup core flow -----
 async function autoSetupCore(homey) {
   // 1) login
-  const { cookie } = await login(homey);
+  const { cookie, user } = await login(homey);
+  const loginUserId = user?.mobile_user_id;
 
-  // 2) discover domain from groups/accessible
-  const groups = await getAccessibleGroups(homey, cookie);
-  const domain = firstUuidDeep(groups);
-  if (!domain) throw new Error('Could not determine domain automatically.');
-  _log(homey, `domain (from groups/accessible) = ${domain}`);
+  // 2) robust domain detection
+  const { domainId: domain, info } = await resolveDomainId(homey, cookie, loginUserId);
+  _log(homey, `device list length = ${info?.mobile_group_data?.devices?.length ?? 0}`);
 
-  // 3) fetch IOs & device uuid
-  const info = await getGroupInfo(homey, cookie, domain);
-  const ioList = info?.mobile_group_data?.io || [];
-  _log(homey, `IO strings found: ${ioList.length}`);
+  // 3) get device uuid & IO map from group info
   const device_uuid = info?.mobile_group_data?.devices?.[0]?.id;
   if (!device_uuid) throw new Error('Could not determine device UUID from getInfo.');
   _log(homey, `device_uuid = ${device_uuid}`);
 
-  // 4) probe IOs and categorize
+  // 4) probe IOs and categorize (tweak #2: pass recent 'after')
+  const afterCutoff = Date.now() - AFTER_WINDOW_MS;
+
   const found = { domain, device_uuid, switches: [] };
   const oCandidates = Array.from({ length: 13 }, (_, i) => `${device_uuid}.o${i}`);
   const iCandidates = Array.from({ length: 8 },  (_, i) => `${device_uuid}.i${i}`);
 
   const probe = async (io) => {
     try {
-      const arr = await getStats(homey, cookie, domain, io, 0);
-      if (!arr.length) return;
+      const arr = await getStats(homey, cookie, domain, io, afterCutoff);
+      if (!arr || !arr.length) return; // silent on 0 (tweak #3)
       const det = detectFromStats(arr);
       if (det.kind === 'switch' || det.kind === 'state_power') {
         _trace(homey, `switch at ${io}`);
@@ -244,7 +327,7 @@ async function autoSetupCore(homey) {
 
 // ----- Exported API (default export required by ManagerApi) -----
 export default {
-  // Quick connectivity check; returns minimal info
+  // Quick connectivity check
   async testApi({ homey }) {
     const { cookie, user } = await login(homey);
     return {
@@ -256,14 +339,8 @@ export default {
 
   // Return domain + device uuid + raw IO IDs (does not persist)
   async discoverIos({ homey }) {
-    const { cookie } = await login(homey);
-    let domain = homey.settings.get('domain');
-    if (!domain) {
-      const groups = await getAccessibleGroups(homey, cookie);
-      domain = firstUuidDeep(groups);
-    }
-    if (!domain) throw new Error('discoverIos: could not determine domain.');
-    const info = await getGroupInfo(homey, cookie, domain);
+    const { cookie, user } = await login(homey);
+    const { domainId: domain, info } = await resolveDomainId(homey, cookie, user?.mobile_user_id);
     const device_uuid = info?.mobile_group_data?.devices?.[0]?.id || null;
     const io = (info?.mobile_group_data?.io || []).map(x => x.id);
     return { domain, device_uuid, io };
