@@ -1,1 +1,51 @@
-<!doctype html><html><head><meta charset="utf-8"/><script src="/homey.js" data-origin="pair"></script></head><body><script>function onHomeyReady(Homey){Homey.ready();}</script></body></html>
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <script type="text/javascript" src="/homey.js" data-origin="pair"></script>
+    <style>
+      body { font-family: sans-serif; padding: 16px; }
+      #device-list { list-style: none; padding: 0; }
+      #device-list li { margin: 8px 0; }
+      button { padding: 10px 16px; }
+    </style>
+  </head>
+  <body>
+    <h2>Select a WiFi Pool device</h2>
+    <p id="status">Searching for devices...</p>
+    <ul id="device-list"></ul>
+    <script>
+      async function onHomeyReady(Homey) {
+        Homey.ready(); // stop spinner
+        const status = document.getElementById('status');
+        const list = document.getElementById('device-list');
+        try {
+          const devices = await Homey.emit('list_devices');
+          if (!devices.length) {
+            status.textContent = 'No devices found.';
+            return;
+          }
+          status.textContent = 'Select a device to add:';
+          for (const device of devices) {
+            const li = document.createElement('li');
+            const btn = document.createElement('button');
+            btn.textContent = device.name || device.data.id;
+            btn.addEventListener('click', async () => {
+              try {
+                await Homey.emit('add_device', {});
+                Homey.done();
+              } catch (err) {
+                Homey.alert('Error: ' + (err && err.message ? err.message : err));
+              }
+            });
+            li.appendChild(btn);
+            list.appendChild(li);
+          }
+        } catch (err) {
+          status.textContent = 'Error while loading devices.';
+          Homey.alert('Error: ' + (err && err.message ? err.message : err));
+        }
+      }
+    </script>
+  </body>
+</html>
