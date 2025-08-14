@@ -1,0 +1,30 @@
+### Login
+POST https://api.wifipool.eu/native_mobile/users/login
+Content-Type: application/json
+
+{
+  "email": "{{email}}",
+  "password": "{{password}}",
+  "namespace": "default"
+}
+
+### Groups
+GET https://api.wifipool.eu/native_mobile/groups/accessible
+
+### Group info
+POST https://api.wifipool.eu/native_mobile/groups/getInfo
+Content-Type: application/json
+
+{
+  "domainId": "{{domain}}"
+}
+
+### Stats
+POST https://api.wifipool.eu/native_mobile/harmopool/getStats
+Content-Type: application/json
+
+{
+  "domain": "{{domain}}",
+  "io": "{{device_uuid}}.o4",
+  "after": 0
+}

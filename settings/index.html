@@ -1,127 +1,149 @@
 <!doctype html>
-<html>
+<html lang="en">
 <head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>WiFi Pool Settings</title>
-  <script src="/homey.js" data-origin="settings"></script>
+  <meta charset="utf-8" />
+  <title>WiFiPool Settings</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
-    body { font-family: system-ui, sans-serif; padding: 16px; }
-    label { display:block; margin-top:12px; font-weight:600; }
-    input { width:100%; padding:8px; box-sizing:border-box; }
-    .row { margin-bottom: 8px; }
-    .btns { margin-top: 16px; display:flex; gap:8px; flex-wrap: wrap; }
-    .log { margin-top:16px; background:#0b1020; color:#e0f0ff; padding:10px; border-radius:8px; height:220px; overflow:auto; font-family:monospace; font-size:12px; }
-    .hint { color:#666; font-size: 12px; }
+    body { font: 14px/1.4 system-ui, -apple-system, Segoe UI, Roboto, Arial; padding: 16px; }
+    .row { margin: 8px 0; }
+    input[type="text"], input[type="password"], input[type="number"] {
+      width: 100%; padding: 8px; box-sizing: border-box;
+    }
+    button { padding: 8px 12px; margin-right: 8px; cursor: pointer; }
+    pre { background:#111; color:#0f0; padding:12px; overflow:auto; max-height:240px; }
+    .grid { display:grid; grid-template-columns: 1fr 1fr; gap:16px; }
+    .card { border:1px solid #ddd; border-radius:8px; padding:12px; }
+    .kv { display:grid; grid-template-columns: 140px 1fr; gap:6px 10px; }
+    .muted { color:#666 }
   </style>
 </head>
 <body>
-  <h2>WiFi Pool — Settings</h2>
+  <h2>WiFiPool – Settings</h2>
 
-  <div class="row">
-    <label for="email">Email</label>
-    <input id="email" type="email" placeholder="you@example.com"/>
+  <div class="grid">
+    <div class="card">
+      <h3>Credentials</h3>
+      <div class="row">
+        <label>Email</label>
+        <input id="email" type="text" placeholder="you@example.com"/>
+      </div>
+      <div class="row">
+        <label>Password</label>
+        <input id="password" type="password" placeholder="••••••••"/>
+      </div>
+      <div class="row">
+        <label>Domain (optional — filled by Auto Setup)</label>
+        <input id="domain" type="text" placeholder="auto-discovered"/>
+      </div>
+      <div class="row">
+        <label>Poll interval (seconds)</label>
+        <input id="poll_interval" type="number" min="15" step="5" />
+      </div>
+      <div class="row">
+        <button id="save">Save</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Actions</h3>
+      <div class="row">
+        <button id="btn-test">Test API</button>
+        <button id="btn-discover">Discover IOs</button>
+        <button id="btn-autosetup"><b>Auto Setup</b></button>
+      </div>
+      <div class="row muted">
+        The console below shows what’s sent to/received from the API.
+      </div>
+      <pre id="log">(console)</pre>
+    </div>
   </div>
-  <div class="row">
-    <label for="password">Password</label>
-    <input id="password" type="password" placeholder="••••••••"/>
-  </div>
-  <div class="row">
-    <label for="domain">Domain</label>
-    <small class="hint">Tenant/organisatie ID (meestal UUID). Wordt door Auto Setup gezet.</small>
-    <input id="domain" type="text" placeholder="2ca59577-...-be790"/>
-  </div>
-  <div class="row">
-    <label for="device_uuid">Device UUID</label>
-    <small class="hint">Prefix vóór <code>.o0/.o3/.o4</code>. Wordt door Auto Setup gezet.</small>
-    <input id="device_uuid" type="text" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"/>
-  </div>
-  <div class="row">
-    <label for="poll">Polling interval (seconds)</label>
-    <input id="poll" type="number" min="15" step="1" placeholder="60"/>
+
+  <div class="card" style="margin-top:16px">
+    <h3>Discovered config (read-only preview)</h3>
+    <div id="preview" class="kv">
+      <!-- filled dynamically -->
+    </div>
   </div>
 
-  <div class="btns">
-    <button id="save">Save</button>
-    <button id="reload">Reload</button>
-    <button id="testapi">Test API</button>
-    <button id="discover">Discover IOs</button>
-    <button id="autosetup">Auto Setup</button>
-  </div>
+<script>
+  // --- tiny helpers
+  const $ = id => document.getElementById(id);
+  const log = (...args) => {
+    const pre = $('log');
+    pre.textContent += '\n' + args.map(a => (typeof a === 'string' ? a : JSON.stringify(a, null, 2))).join(' ');
+    pre.scrollTop = pre.scrollHeight;
+  };
 
-  <div class="log" id="log"></div>
+  async function loadSettings() {
+    const s = await Homey.getSettings();
+    $('email').value = s.email || '';
+    $('password').value = s.password || '';
+    $('domain').value = s.domain || '';
+    $('poll_interval').value = s.poll_interval || 60;
+    renderPreview(s);
+  }
 
-  <script>
-    function onHomeyReady(Homey){
-      const $ = id => document.getElementById(id);
-      const log = (...m) => {
-        const el=$('log');
-        el.textContent += m.map(x => (typeof x==='string'? x : JSON.stringify(x))).join(' ') + "\n";
-        el.scrollTop = el.scrollHeight;
-      };
+  function renderPreview(s) {
+    const wrap = $('preview');
+    const io = s.io_map || {};
+    wrap.innerHTML = `
+      <div>Domain</div><div>${s.domain || '<span class="muted">not set</span>'}</div>
+      <div>Device UUID</div><div>${s.device_uuid || '<span class="muted">unknown</span>'}</div>
+      <div>pH IO</div><div>${io.ph || '<span class="muted">not found</span>'}</div>
+      <div>Redox IO</div><div>${io.redox || '<span class="muted">not found</span>'}</div>
+      <div>Flow IO</div><div>${io.flow || '<span class="muted">not found</span>'}</div>
+      <div>Temperature IO</div><div>${io.temperature || '<span class="muted">not found</span>'}</div>
+      <div>Discovered At</div><div>${s.discovered_at || '<span class="muted">n/a</span>'}</div>
+    `;
+  }
 
-      async function load(){
-        $('email').value       = await Homey.get('email') || '';
-        $('password').value    = await Homey.get('password') || '';
-        $('domain').value      = await Homey.get('domain') || '';
-        $('device_uuid').value = await Homey.get('device_uuid') || '';
-        $('poll').value        = await Homey.get('poll_interval') || 60;
-      }
+  $('save').onclick = async () => {
+    const payload = {
+      email: $('email').value.trim(),
+      password: $('password').value,
+      domain: $('domain').value.trim(),
+      poll_interval: Number($('poll_interval').value || 60),
+    };
+    await Homey.setSettings(payload);
+    log('Saved settings', { email: payload.email, domain: payload.domain, poll_interval: payload.poll_interval });
+    await loadSettings();
+  };
 
-      $('save').addEventListener('click', async ()=>{
-        await Homey.set('email', $('email').value || '');
-        await Homey.set('password', $('password').value || '');
-        await Homey.set('domain', $('domain').value || '');
-        await Homey.set('device_uuid', $('device_uuid').value || '');
-        await Homey.set('poll_interval', Math.max(15, parseInt(($('poll').value || '60'),10)));
-        log('Saved settings.');
-        Homey.alert('Saved. Devices will pick up changes automatically.');
-      });
+  async function call(path) {
+    const url = `/api/app/${Homey.manifest.id}${path}`;
+    const res = await fetch(url, { method: 'POST' });
+    const txt = await res.text();
+    let json;
+    try { json = JSON.parse(txt); } catch { json = { ok:false, raw: txt }; }
+    return json;
+  }
 
-      $('reload').addEventListener('click', async ()=>{
-        await load(); log('Reloaded.');
-      });
+  $('btn-test').onclick = async () => {
+    log('→ Test API…');
+    const r = await call('/test');
+    log('←', r);
+  };
 
-      $('testapi').addEventListener('click', async ()=>{
-        const btn = $('testapi'); btn.disabled=true; btn.textContent='Testing…';
-        try {
-          const res = await Homey.api('POST','/test');
-          log('Test API:', res);
-          Homey.alert('Test API finished');
-        } catch(e) {
-          log('Test API error:', e && e.message ? e.message : e);
-          Homey.alert('Test API error');
-        } finally { btn.disabled=false; btn.textContent='Test API'; }
-      });
+  $('btn-discover').onclick = async () => {
+    log('→ Discover IOs…');
+    const r = await call('/discover');
+    log('←', r);
+    renderPreview(await Homey.getSettings());
+  };
 
-      $('discover').addEventListener('click', async ()=>{
-        const btn = $('discover'); btn.disabled=true; btn.textContent='Discovering…';
-        try {
-          const res = await Homey.api('POST','/discover');
-          log('Discovery:', res);
-          Homey.alert('Discovery finished');
-        } catch(e) {
-          log('Discovery error:', e && e.message ? e.message : e);
-          Homey.alert('Discovery error');
-        } finally { btn.disabled=false; btn.textContent='Discover IOs'; }
-      });
+  $('btn-autosetup').onclick = async () => {
+    log('→ Auto Setup…');
+    const r = await call('/autosetup');
+    log('←', r);
+    await loadSettings();
+  };
 
-      $('autosetup').addEventListener('click', async ()=>{
-        const btn = $('autosetup'); btn.disabled=true; btn.textContent='Running…';
-        try {
-          const res = await Homey.api('POST','/autosetup');
-          log('Auto-setup:', res);
-          if (res && res.domain)      $('domain').value = res.domain;
-          if (res && res.deviceUuid)  $('device_uuid').value = res.deviceUuid;
-          Homey.alert('Auto-setup finished');
-        } catch(e) {
-          log('Auto-setup error:', e && e.message ? e.message : e);
-          Homey.alert('Auto-setup error');
-        } finally { btn.disabled=false; btn.textContent='Auto Setup'; }
-      });
+  Homey.on('settings.set', async () => {
+    await loadSettings();
+  });
 
-      load().finally(()=>Homey.ready());
-    }
-  </script>
+  loadSettings().catch(err => log('Failed to load settings:', String(err)));
+</script>
 </body>
 </html>

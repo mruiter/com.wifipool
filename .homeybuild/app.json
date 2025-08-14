@@ -26,15 +26,15 @@
     "homey:app:com.wifipool"
   ],
   "api": {
-    "autosetup": {
+    "autoSetup": {
       "method": "POST",
       "path": "/autosetup"
     },
-    "discover": {
+    "discoverIos": {
       "method": "POST",
       "path": "/discover"
     },
-    "test": {
+    "testApi": {
       "method": "POST",
       "path": "/test"
     }

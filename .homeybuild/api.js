@@ -1,188 +1,277 @@
-import { WiFiPoolClient } from './lib/wifipool.mjs';
+// api.js — Homey SDK v3 (ESM)
+// Endpoints (must match app.json "api" section):
+//   - testApi      (POST /test)
+//   - discoverIos  (POST /discover)
+//   - autoSetup    (POST /autosetup)
+//
+// app.json example:
+/*
+"api": [
+  { "id": "testApi",     "path": "/test",      "method": "POST", "public": false },
+  { "id": "discoverIos", "path": "/discover",  "method": "POST", "public": false },
+  { "id": "autoSetup",   "path": "/autosetup", "method": "POST", "public": false }
+]
+*/
+// package.json needs: { "type": "module", "dependencies": { "node-fetch": "^3.3.2" } }
 
+import fetch from 'node-fetch';
 
+const BASE = 'https://api.wifipool.eu/native_mobile';
+let REQ = 0;
 
-function _firstDs18b20Key(dsd){
-  try{
-    const obj = dsd?.ds18b20;
-    if (obj && typeof obj === 'object'){
-      const keys = Object.keys(obj).filter(k => obj[k] && typeof obj[k].temperature !== 'undefined');
-      if (keys.length) return keys[0];
+// ----- logging helpers -----
+function _log(homey, msg)   { homey.log(`[WiFiPool][API] ${msg}`); }
+function _trace(homey, msg) { homey.log(`[WiFiPool] ${msg}`); }
+function _error(homey, msg) { homey.error(`[WiFiPool][API] ${msg}`); }
+
+function _redact(val) {
+  if (!val || typeof val !== 'string') return val;
+  return val
+    .replace(/([A-Za-z0-9._%+-]{2})[A-Za-z0-9._%+-]*(@)/g, '$1***$2')
+    .replace(/([A-Za-z0-9._%+-]{2})[A-Za-z0-9._%+-]*(\.[A-Za-z]{2,})/g, '$1***$2');
+}
+
+// ----- HTTP helper -----
+async function httpRequest(homey, method, resource, { body, cookie } = {}) {
+  const url = `${BASE}${resource}`;
+  const id = ++REQ;
+  const headers = { 'Content-Type': 'application/json' };
+  if (cookie) headers.Cookie = cookie;
+
+  _trace(homey, `[#${id}] >>> ${method} ${resource} ${url}`);
+  _trace(homey, `[#${id}] >>> Headers ${JSON.stringify(headers)}`);
+  if (body) _trace(homey, `[#${id}] >>> Body ${JSON.stringify(maskBody(body))}`);
+
+  const t0 = Date.now();
+  const res = await fetch(url, {
+    method,
+    headers,
+    body: body ? JSON.stringify(body) : undefined,
+  });
+  const ms = Date.now() - t0;
+
+  _trace(homey, `[#${id}] <<< Status ${res.status}`);
+  const setCookie = res.headers?.raw?.()['set-cookie'] || res.headers.get?.('set-cookie') || null;
+  if (setCookie) _trace(homey, `[#${id}] <<< Set-Cookie ${JSON.stringify(setCookie)}`);
+  _trace(homey, `[#${id}] <<< Time ${ms}ms`);
+
+  const text = await res.text();
+  try {
+    const json = text ? JSON.parse(text) : undefined;
+    if (json && resource.includes('/users/login')) {
+      _trace(homey, `[#${id}] <<< Login response body sample ${JSON.stringify(json).slice(0, 1000)}`);
     }
-  }catch(e){}
+    return { status: res.status, json, text: undefined, setCookie, timeMs: ms };
+  } catch {
+    if (text && text.length < 200) _trace(homey, `[#${id}] <<< Body sample ${text}`);
+    return { status: res.status, json: undefined, text, setCookie, timeMs: ms };
+  }
+}
+
+function maskBody(body) {
+  const clone = JSON.parse(JSON.stringify(body));
+  if (clone.password) clone.password = '***';
+  if (clone.email) clone.email = _redact(clone.email);
+  return clone;
+}
+
+function extractSessionCookie(setCookie) {
+  if (!setCookie) return null;
+  const arr = Array.isArray(setCookie) ? setCookie : [setCookie];
+  for (const c of arr) {
+    const m = String(c).match(/connect\.sid=([^;]+)/);
+    if (m) return `connect.sid=${m[1]}`;
+  }
   return null;
 }
 
-function _suffixesForDeviceFromInfo(info, deviceUuid){
-  const out = new Set();
-  try{
-    const arr = info?.mobile_group_data?.io || [];
-    for (const it of arr){
-      if (it?.device === deviceUuid && typeof it?.id === 'string'){
-        const m = it.id.split('.'); if (m.length===2) out.add(m[1]);
-      }
-    }
-  }catch(e){ /* ignore */ }
-  // Fallback: if nothing found, return common guess set
-  if (!out.size) ['o0','o1','o2','o3','o4','o5','o6','o7','o8','i0','i1','i2','i3'].forEach(s=>out.add(s));
-  return Array.from(out);
+// ----- minimal WiFiPool client -----
+async function login(homey) {
+  const email = homey.settings.get('email');
+  const password = homey.settings.get('password');
+  if (!email || !password) throw new Error('Email and/or Password not set in App Settings.');
+
+  const r = await httpRequest(homey, 'POST', '/users/login', {
+    body: { email, namespace: 'default', password },
+  });
+  if (r.status !== 200) throw new Error(`Login failed: HTTP ${r.status}`);
+
+  const cookie = extractSessionCookie(r.setCookie);
+  if (!cookie) _error(homey, 'No connect.sid cookie returned!');
+  else _trace(homey, 'Login OK, cookies captured');
+
+  return { cookie, user: r.json?.user || null };
 }
 
-function _findDomainFromGroups(groups){
-  const rxUUID = /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i;
-  if (!Array.isArray(groups)) return null;
-  for (const g of groups){
-    if (!g || typeof g !== 'object') continue;
-    // Preferred explicit keys
-    for (const key of ['mobile_group_domainid','mobile_group_id','domainId','domain','groupId','tenantId']) {
-      const v = g[key];
-      if (typeof v === 'string' && rxUUID.test(v)) return v;
+async function getAccessibleGroups(homey, cookie) {
+  const r = await httpRequest(homey, 'GET', '/groups/accessible', { cookie });
+  if (r.status !== 200 || !r.json) throw new Error(`groups/accessible failed: HTTP ${r.status}`);
+  return r.json;
+}
+
+async function getGroupInfo(homey, cookie, domainId) {
+  const r = await httpRequest(homey, 'POST', '/groups/getInfo', { cookie, body: { domainId } });
+  if (r.status !== 200 || !r.json) throw new Error(`groups/getInfo failed: HTTP ${r.status}`);
+  return r.json;
+}
+
+async function getStats(homey, cookie, domain, io, after = 0) {
+  const r = await httpRequest(homey, 'POST', '/harmopool/getStats', {
+    cookie, body: { domain, io, after },
+  });
+  if (r.status === 404 && r.text) {
+    _error(homey, `getStats 404: ${r.text}`);
+    throw new Error(`getStats 404: ${r.text}`);
+  }
+  if (r.status !== 200) throw new Error(`getStats failed: HTTP ${r.status}`);
+  const arr = r.json || [];
+  _trace(homey, `getStats response items: ${arr.length}`);
+  return arr;
+}
+
+// ----- discovery helpers -----
+function firstUuidDeep(obj) {
+  const re = /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i;
+  let found = null;
+  (function walk(x) {
+    if (found || x == null) return;
+    if (typeof x === 'string') {
+      const m = x.match(re);
+      if (m) { found = m[0]; return; }
+    } else if (Array.isArray(x)) {
+      for (const v of x) walk(v);
+    } else if (typeof x === 'object') {
+      for (const k of Object.keys(x)) walk(x[k]);
     }
-    // Search nested fields for something that looks like a domain UUID but is NOT a device uuid reference
-    const stack = [g];
-    while (stack.length){
-      const o = stack.pop();
-      if (Array.isArray(o)) { stack.push(...o); continue; }
-      if (o && typeof o === 'object'){
-        for (const [k,v] of Object.entries(o)){
-          if (typeof v === 'string'){
-            if (rxUUID.test(v)){
-              // Exclude IO strings 'xxxx.o3' / device ids inside devices[] (we try to avoid those by key name)
-              if (v.includes('.')) continue;
-              if (/device/.test(k) || /serial/i.test(k) || /type/i.test(k)) continue;
-              return v;
-            }
-          } else if (v && typeof v === 'object'){
-            stack.push(v);
-          }
+  })(obj);
+  return found;
+}
+
+function detectFromStats(arr) {
+  for (const it of arr) {
+    if (it.device_sensor_data) {
+      const d = it.device_sensor_data;
+      if (d.switch) {
+        const key = Object.keys(d.switch)[0];
+        return { kind: 'switch', key, sample: d.switch[key] };
+      }
+      if (d.analog) {
+        const key = Object.keys(d.analog)[0];
+        return { kind: 'analog', key, sample: d.analog[key] };
+      }
+      if (d.ds18b20) {
+        const key = Object.keys(d.ds18b20)[0];
+        return { kind: 'ds18b20', key, sample: d.ds18b20[key]?.temperature };
+      }
+    }
+    if (it.device_state_data?.power) {
+      const key = Object.keys(it.device_state_data.power)[0];
+      return { kind: 'state_power', key, sample: it.device_state_data.power[key] };
+    }
+  }
+  return { kind: null };
+}
+
+async function autoSetupCore(homey) {
+  // 1) login
+  const { cookie } = await login(homey);
+
+  // 2) discover domain from groups/accessible
+  const groups = await getAccessibleGroups(homey, cookie);
+  const domain = firstUuidDeep(groups);
+  if (!domain) throw new Error('Could not determine domain automatically.');
+  _log(homey, `domain (from groups/accessible) = ${domain}`);
+
+  // 3) fetch IOs & device uuid
+  const info = await getGroupInfo(homey, cookie, domain);
+  const ioList = info?.mobile_group_data?.io || [];
+  _log(homey, `IO strings found: ${ioList.length}`);
+  const device_uuid = info?.mobile_group_data?.devices?.[0]?.id;
+  if (!device_uuid) throw new Error('Could not determine device UUID from getInfo.');
+  _log(homey, `device_uuid = ${device_uuid}`);
+
+  // 4) probe IOs and categorize
+  const found = { domain, device_uuid, switches: [] };
+  const oCandidates = Array.from({ length: 13 }, (_, i) => `${device_uuid}.o${i}`);
+  const iCandidates = Array.from({ length: 8 },  (_, i) => `${device_uuid}.i${i}`);
+
+  const probe = async (io) => {
+    try {
+      const arr = await getStats(homey, cookie, domain, io, 0);
+      if (!arr.length) return;
+      const det = detectFromStats(arr);
+      if (det.kind === 'switch' || det.kind === 'state_power') {
+        _trace(homey, `switch at ${io}`);
+        found.switches.push(io);
+      } else if (det.kind === 'analog') {
+        const v = Number(det.sample);
+        if (!Number.isFinite(v)) return;
+        if (v >= 0 && v <= 14 && !found.ph) {
+          found.ph = { io, key: det.key };
+          _log(homey, `ph at ${io}`);
+        } else if (v > 100 && v < 1500 && !found.redox) {
+          found.redox = { io, key: det.key };
+          _log(homey, `redox at ${io}`);
+        } else if (!found.flow) {
+          found.flow = { io, key: det.key };
+          _log(homey, `flow (analog?) at ${io}`);
         }
+      } else if (det.kind === 'ds18b20' && !found.temperature) {
+        found.temperature = { io, key: det.key };
+        _log(homey, `temperature (ds18b20) at ${io} key ${det.key}`);
       }
+    } catch {
+      // probing errors are non-fatal
     }
+  };
+
+  for (const io of [...iCandidates, ...oCandidates]) {
+    // eslint-disable-next-line no-await-in-loop
+    await probe(io);
   }
-  return null;
+
+  // 5) persist for driver
+  await homey.settings.set('domain', domain);
+  await homey.settings.set('device_uuid', device_uuid);
+  await homey.settings.set('io_map', found);
+  const count = (found.switches?.length || 0)
+    + (found.ph ? 1 : 0) + (found.redox ? 1 : 0)
+    + (found.flow ? 1 : 0) + (found.temperature ? 1 : 0);
+  _log(homey, `saved io_map entries = ${count}`);
+
+  return found;
 }
 
-
-/**
- * Web API handlers as default-exported object.
- * Keys must match the names in app.json's "api" section.
- * Each handler receives: { homey, params, query, body }
- */
+// ----- Exported API (default export required by ManagerApi) -----
 export default {
-  async autosetup({ homey }){
-    const log = (...a)=>homey.app.log('[WiFiPool][API]', ...a);
-    const error = (...a)=>homey.app.error('[WiFiPool][API]', ...a);
-    try{
-      const client = new WiFiPoolClient(homey.app);
-      await client._doLogin();
-
-      const groups = await client.getAccessibleGroups().catch(()=>[]);
-let domain = homey.settings.get('domain');
-if (!domain) {
-  const cand = _findDomainFromGroups(groups);
-  if (cand) { await homey.settings.set('domain', cand); domain = cand; homey.app.log('[WiFiPool][API] domain (from groups/accessible) =', domain); }
-}
-if (!domain) throw new Error('Could not determine domain automatically.');
-
-      const info = await client.getGroupInfo(domain).catch(()=>null);
-      let ioStrings = [];
-      if (info) ioStrings = client.collectIOsFromObject(info);
-      log('IO strings found:', ioStrings.length);
-
-      const byDevice = {};
-      for (const s of ioStrings){
-        const [dev, suf] = s.split('.');
-        if (!dev || !suf) continue;
-        byDevice[dev] = byDevice[dev] || new Set();
-        byDevice[dev].add(suf);
-      }
-      const devices = Object.keys(byDevice).sort((a,b)=>(byDevice[b]?.size||0)-(byDevice[a]?.size||0));
-      if (!devices.length) throw new Error('No IOs found in group info.');
-      const deviceUuid = devices[0];
-      await homey.settings.set('device_uuid', deviceUuid);
-      log('device_uuid =', deviceUuid);
-
-      const suffixes = ['o0','o3','o4','o5','o8','i0','i1','i2','i3'];
-      const mapping = {};
-      for (const suf of suffixes){
-        const io = `${deviceUuid}.${suf}`;
-        try{
-          const arr = await client.getStat({ domain, io, after: 0 });
-          if (Array.isArray(arr) && arr.length){
-            const dsd = arr[arr.length-1].device_sensor_data || {};
-            if (dsd.switch){ mapping[io] = { type:'switch', index:suf }; log('switch at', io); continue; }
-            const a = dsd.analog || {};
-            if (a['4'] && a['4'] > 0 && a['4'] < 14) { mapping[io] = { type:'ph', key:'4' }; log('ph at', io); }
-            if (a['1'] && a['1'] > 100 && a['1'] < 1200) { mapping[io] = { type:'redox', key:'1' }; log('redox at', io); }
-            if (a['0'] && a['0'] >= 0) { mapping[io] = { type:'flow', key:'0' }; log('flow at', io); }
-            if ((a['2'] && a['2'] > -20 && a['2'] < 80) || (a['8'] && a['8'] > -20 && a['8'] < 80)) {
-              const k = a['2'] ? '2' : '8'; mapping[io] = { type:'temperature', key:k }; log('temperature at', io);
-            }
-          }
-        }catch(e){ log('probe failed for', io, e?.message||e); }
-      }
-      await homey.settings.set('io_map', mapping);
-      log('saved io_map entries =', Object.keys(mapping).length);
-      return { ok:true, domain, deviceUuid, entries: Object.keys(mapping).length, mapping };
-    }catch(e){
-      error('autosetup failed:', e?.message||e);
-      throw e;
-    }
+  // Quick connectivity check; returns minimal info
+  async testApi({ homey }) {
+    const { cookie, user } = await login(homey);
+    return {
+      ok: true,
+      user: user?.mobile_user_mail || null,
+      hasCookie: Boolean(cookie),
+    };
   },
 
-  async discover({ homey }){
-    const log = (...a)=>homey.app.log('[WiFiPool][API]', ...a);
-    const error = (...a)=>homey.app.error('[WiFiPool][API]', ...a);
-    try{
-      const client = new WiFiPoolClient(homey.app);
-      await client.ensureLogin();
-      const domain = homey.settings.get('domain');
-      const deviceUuid = homey.settings.get('device_uuid');
-      if (!domain) throw new Error('Set Domain first');
-      if (!deviceUuid) throw new Error('Set Device UUID first');
-      const suffixes = ['o0','o3','o4','o5','o8','i0','i1','i2','i3'];
-      const mapping = {};
-      for (const suf of suffixes){
-        const io = `${deviceUuid}.${suf}`;
-        try{
-          const arr = await client.getStat({ domain, io, after: 0 });
-          if (Array.isArray(arr) && arr.length){
-            const dsd = arr[arr.length-1].device_sensor_data || {};
-            if (dsd.switch){ mapping[io] = { type:'switch', index:suf }; continue; }
-            const a = dsd.analog || {};
-            if (a['4'] && a['4'] > 0 && a['4'] < 14) { mapping[io] = { type:'ph', key:'4' }; }
-            if (a['1'] && a['1'] > 100 && a['1'] < 1200) { mapping[io] = { type:'redox', key:'1' }; }
-            if (a['0'] && a['0'] >= 0) { mapping[io] = { type:'flow', key:'0' }; }
-            if ((a['2'] && a['2'] > -20 && a['2'] < 80) || (a['8'] && a['8'] > -20 && a['8'] < 80)) {
-              const k = a['2'] ? '2' : '8'; mapping[io] = { type:'temperature', key:k };
-            }
-          }
-        }catch(e){ log('probe failed for', io, e?.message||e); }
-      }
-      await homey.settings.set('io_map', mapping);
-      return { ok:true, entries: Object.keys(mapping).length, mapping };
-    }catch(e){
-      error('discover failed:', e?.message||e);
-      throw e;
+  // Return domain + device uuid + raw IO IDs (does not persist)
+  async discoverIos({ homey }) {
+    const { cookie } = await login(homey);
+    let domain = homey.settings.get('domain');
+    if (!domain) {
+      const groups = await getAccessibleGroups(homey, cookie);
+      domain = firstUuidDeep(groups);
     }
+    if (!domain) throw new Error('discoverIos: could not determine domain.');
+    const info = await getGroupInfo(homey, cookie, domain);
+    const device_uuid = info?.mobile_group_data?.devices?.[0]?.id || null;
+    const io = (info?.mobile_group_data?.io || []).map(x => x.id);
+    return { domain, device_uuid, io };
   },
 
-  async test({ homey }){
-    const log = (...a)=>homey.app.log('[WiFiPool][API]', ...a);
-    const error = (...a)=>homey.app.error('[WiFiPool][API]', ...a);
-    try{
-      const client = new WiFiPoolClient(homey.app);
-      await client._doLogin();
-      const domain = homey.settings.get('domain');
-      const deviceUuid = homey.settings.get('device_uuid');
-      if (!domain) throw new Error('Missing Domain in settings');
-      if (!deviceUuid) throw new Error('Missing Device UUID in settings');
-      const io = `${deviceUuid}.o3`;
-      const arr = await client.getStat({ domain, io, after: 0 });
-      return { ok:true, items: Array.isArray(arr) ? arr.length : 0 };
-    }catch(e){
-      error('test failed:', e?.message||e);
-      throw e;
-    }
-  }
+  // Full auto-setup and persist to settings
+  async autoSetup({ homey }) {
+    const result = await autoSetupCore(homey);
+    return { ok: true, ...result };
+  },
 };

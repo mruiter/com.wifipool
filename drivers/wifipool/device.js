@@ -1,119 +1,115 @@
+// drivers/wifipool/device.js  (ESM)
 import Homey from 'homey';
-import { WiFiPoolClient } from '../../lib/wifipool.mjs';
+import WiFiPoolClient from '../../lib/wifipool.mjs';
 
 export default class WiFiPoolDevice extends Homey.Device {
-  async onInit(){
-    this.log('[WiFiPool] Device init', this.getName(), this.getData());
-    this._client = new WiFiPoolClient({ homey: this.homey, log: (...a)=>this.log(...a), error: (...a)=>this.error(...a) });
-    await this._ensureBaseCaps();
-    this.reschedulePolling();
+  async onInit() {
+    this._tag = '[WiFiPool][Device]';
+    this.log(`${this._tag} init: ${this.getName()}`);
+
+    const pollSec = Number(this.homey.settings.get('poll_interval') || 60);
+    this._pollMs = Math.max(15, pollSec) * 1000;
+
+    this._client = new WiFiPoolClient(this.homey, undefined, true);
+
+    await this._pollOnce().catch(err => this.error(`${this._tag} first poll error`, err));
+    this._timer = this.homey.setInterval(() => {
+      this._pollOnce().catch(err => this.error(`${this._tag} poll error`, err));
+    }, this._pollMs);
   }
 
-  async onDeleted(){ if(this._interval) clearInterval(this._interval); }
-
-  async _ensureBaseCaps(){
-    const base = ['alarm_health'];
-    for(const c of base){ if(!this.hasCapability(c)) await this.addCapability(c).catch(()=>{}); }
+  async onUninit() {
+    if (this._timer) this.homey.clearInterval(this._timer);
   }
 
-  reschedulePolling(){
-    if(this._interval) clearInterval(this._interval);
-    const seconds = Math.max(15, Number(this.homey.settings.get('poll_interval') || 60));
-    this.log(`[WiFiPool] Start polling every ${seconds}s`);
-    this._interval = setInterval(() => this.pollOnce().catch(err => this.error('[WiFiPool] Poll error', err)), seconds*1000);
-    this.pollOnce().catch(err => this.error(err));
-  }
+  async _pollOnce() {
+    const keys = this.homey.settings.getKeys();
+    const s = {};
+    for (const k of keys) s[k] = this.homey.settings.get(k);
 
-  async pollOnce(){
-    const domain = this.homey.settings.get('domain');
-    const deviceUuid = this.homey.settings.get('device_uuid');
-    if(!domain){ this.error('[WiFiPool] Missing Domain in settings'); await this.setUnavailable('Set Domain'); await this.setCapabilityValue('alarm_health', true).catch(()=>{}); return; }
-    if(!deviceUuid){ this.error('[WiFiPool] Missing Device UUID in settings'); await this.setUnavailable('Set Device UUID'); await this.setCapabilityValue('alarm_health', true).catch(()=>{}); return; }
+    const email = s.email, password = s.password, domain = s.domain;
+    const io = s.io_map || {};
 
-    const ioMap = this.homey.settings.get('io_map') || {};
-    const entries = Object.entries(ioMap).map(([io, meta]) => ({io, meta}));
-    if(!entries.length){ this.log('[WiFiPool] No io_map, skipping poll. Use Auto Setup or Discover IOs in settings.'); return; }
+    if (!email || !password || !domain) {
+      this.log(`${this._tag} missing email/password/domain → skip`);
+      await this._health(true);
+      return;
+    }
 
-    const client = this._client;
-    this.log('[WiFiPool] Using domain=', domain, 'deviceUuid=', deviceUuid);
-    for(const {io, meta} of entries){
-      try{
-        this.log('[WiFiPool] Fetching', meta.type, 'io=', io);
-        const json = await client.getStat({ domain, io, after: 0 });
-        const last = Array.isArray(json) && json.length ? json[json.length-1] : {};
-        const dsd = last.device_sensor_data || {};
-        const keys = dsd ? Object.keys(dsd).join(',') : '(none)';
-        this.log('[WiFiPool] device_sensor_data keys:', keys);
-
-        await this._applyReading(io, meta, dsd);
-        await this.setAvailable().catch(()=>{});
-        await this.setCapabilityValue('alarm_health', false).catch(()=>{});
-      }catch(e){
-        this.error('[WiFiPool] poll error for', io, e?.message||e);
-        await this.setCapabilityValue('alarm_health', true).catch(()=>{});
+    try {
+      if (typeof this._client.ensureLogin === 'function') {
+        await this._client.ensureLogin(email, password);
+      } else {
+        await this._client.login(email, password);
       }
+
+      const updates = {};
+
+      if (io.ph) {
+        const v = await this._readAnalog(domain, io.ph);
+        if (v != null) updates.measure_ph = Number(v);
+      }
+
+      if (io.redox) {
+        const v = await this._readAnalog(domain, io.redox);
+        if (v != null) updates.measure_redox = Number(v);
+      }
+
+      if (io.flow) {
+        const v = await this._readAnalog(domain, io.flow);
+        if (v != null) updates.measure_flow = Number(v);
+      }
+
+      if (io.temperature && this.hasCapability('measure_temperature')) {
+        const t = await this._readDs18b20(domain, io.temperature);
+        if (t != null) updates.measure_temperature = Number(t);
+      }
+
+      for (const [cap, val] of Object.entries(updates)) {
+        if (this.hasCapability(cap)) {
+          const prev = this.getCapabilityValue(cap);
+          if (prev !== val) {
+            await this.setCapabilityValue(cap, val);
+            try {
+              const map = { measure_ph: 'ph_updated', measure_redox: 'redox_updated', measure_flow: 'flow_updated' };
+              const trigId = map[cap];
+              if (trigId && this.homey?.flow?.getTriggerCard) {
+                const trig = this.homey.flow.getTriggerCard(trigId);
+                if (trig) await trig.trigger(this, { value: val });
+              }
+            } catch (e) { this.error(`${this._tag} flow trigger error`, e); }
+          }
+        }
+      }
+
+      await this._health(false);
+    } catch (err) {
+      this.error(`${this._tag} poll failed`, err);
+      await this._health(true);
     }
   }
 
-  async _applyReading(io, meta, dsd){
-    switch(meta.type){
-      case 'switch': {
-        const idx = String(meta.index).replace(/[a-z]/i,'');
-        const cap = `onoff_${meta.index}`; // e.g. onoff_o0
-        if(!this.hasCapability(cap)) await this.addCapability(cap).catch(()=>{});
-        if(!this[`__listener_${cap}`]){
-          this[`__listener_${cap}`] = true;
-          this.registerCapabilityListener(cap, async (value)=>{
-            const domain = this.homey.settings.get('domain');
-            const client = this._client;
-            await client.setManualIO({ domain, io, value: value ? 1 : 0 });
-          });
-        }
-        const state = dsd.switch ? !!dsd.switch[idx] : false;
-        await this.setCapabilityValue(cap, state).catch(()=>{});
-        break;
-      }
-      case 'ph': {
-        if(!this.hasCapability('measure_ph')) await this.addCapability('measure_ph').catch(()=>{});
-        const v = this._pickAnalog(dsd, meta.key);
-        if(typeof v === 'number') await this.setCapabilityValue('measure_ph', v).catch(()=>{});
-        this.homey.flow.getTriggerCard('ph_updated').trigger(this, { ph: v }).catch(()=>{});
-        break;
-      }
-      case 'redox': {
-        if(!this.hasCapability('measure_redox')) await this.addCapability('measure_redox').catch(()=>{});
-        const v = this._pickAnalog(dsd, meta.key);
-        if(typeof v === 'number') await this.setCapabilityValue('measure_redox', v).catch(()=>{});
-        this.homey.flow.getTriggerCard('redox_updated').trigger(this, { redox: v }).catch(()=>{});
-        break;
-      }
-      case 'flow': {
-        if(!this.hasCapability('measure_flow')) await this.addCapability('measure_flow').catch(()=>{});
-        let v = this._pickAnalog(dsd, meta.key);
-        if(v == null && typeof dsd.flow !== 'undefined') v = Number(dsd.flow);
-        if(typeof v === 'number') await this.setCapabilityValue('measure_flow', v).catch(()=>{});
-        this.homey.flow.getTriggerCard('flow_updated').trigger(this, { flow: v }).catch(()=>{});
-        break;
-      }
-      case 'temperature': {
-        if(!this.hasCapability('measure_temperature')) await this.addCapability('measure_temperature').catch(()=>{});
-        let v = this._pickAnalog(dsd, meta.key && meta.key.startsWith('ds18b20:') ? null : meta.key);
-        if (v == null && typeof dsd.temperature !== 'undefined') v = Number(dsd.temperature);
-        // DS18B20 path
-        if (v == null && meta.key && String(meta.key).startsWith('ds18b20:')){
-          const k = String(meta.key).split(':')[1];
-          const n = dsd?.ds18b20?.[k]?.temperature;
-          if (n != null) v = Number(n);
-        }
-        if(typeof v === 'number') await this.setCapabilityValue('measure_temperature', v).catch(()=>{});
-        break;
-      }
-    }
+  async _readAnalog(domain, io) {
+    const list = await this._client.getStats(domain, io, 0);
+    if (!Array.isArray(list) || list.length === 0) return null;
+    const lastAnalog = list[list.length - 1]?.device_sensor_data?.analog;
+    if (!lastAnalog) return null;
+    const k = Object.keys(lastAnalog).find(k => typeof lastAnalog[k] === 'number');
+    return k ? lastAnalog[k] : null;
   }
 
-  _pickAnalog(dsd, key){
-    const a = dsd.analog || {};
-    if(key && a && a[key] != null){ const n = Number(a[key]); return Number.isFinite(n) ? n : undefined; }
-    return undefined;
+  async _readDs18b20(domain, io) {
+    const list = await this._client.getStats(domain, io, 0);
+    if (!Array.isArray(list) || list.length === 0) return null;
+    const last = list[list.length - 1]?.device_sensor_data?.ds18b20;
+    if (!last) return null;
+    const key = Object.keys(last).find(k => typeof last[k]?.temperature === 'number');
+    return key ? last[key].temperature : null;
+  }
+
+  async _health(on) {
+    if (!this.hasCapability('alarm_health')) return;
+    const cur = !!this.getCapabilityValue('alarm_health');
+    if (cur !== !!on) await this.setCapabilityValue('alarm_health', !!on);
   }
 }
