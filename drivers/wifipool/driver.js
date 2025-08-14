@@ -8,7 +8,12 @@ export default class WiFiPoolDriver extends Homey.Driver {
 
   // Built-in pairing flow ("pair": [{ "id": "list_devices" }])
   async onPairListDevices() {
-    return this._buildDeviceList();
+    try {
+      return await this._buildDeviceList();
+    } catch (err) {
+      this.error('[WiFiPool][Driver] onPairListDevices failed', err);
+      return [];
+    }
   }
 
   // Session-based pairing (e.g. custom pair/start.html)
