@@ -19,6 +19,6 @@
   "images": {
     "small": "/drivers/wifipool/assets/images/small.jpg",
     "large": "/drivers/wifipool/assets/images/large.jpg",
-	"xlarge": "/drivers/wifipool/assets/images/xlarge.jpg"
-  },
+    "xlarge": "/drivers/wifipool/assets/images/xlarge.jpg"
+  }
 }
