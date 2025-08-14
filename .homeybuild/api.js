@@ -263,7 +263,7 @@ function detectFromStats(arr) {
 }
 
 // ----- Auto-setup core flow -----
-async function autoSetupCore(homey) {
+export async function autoSetupCore(homey) {
   // 1) login
   const { cookie, user } = await login(homey);
   const loginUserId = user?.mobile_user_id;

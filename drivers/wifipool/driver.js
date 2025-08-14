@@ -16,7 +16,7 @@ export default class WiFiPoolDriver extends Homey.Driver {
       return list;
     } catch (err) {
       this.error('[WiFiPool][Driver] onPairListDevices failed', err);
-      return [];
+      throw err; // propagate so UI shows an error instead of empty list
     }
   }
 
@@ -26,9 +26,14 @@ export default class WiFiPoolDriver extends Homey.Driver {
     // For custom UIs that call Homey.emit('list_devices')
     session.setHandler('list_devices', async () => {
       this.log('[WiFiPool][Driver] session.list_devices called');
-      const list = await this._buildDeviceList();
-      this.log(`[WiFiPool][Driver] session.list_devices → ${list.length} device(s)`);
-      return list;
+      try {
+        const list = await this._buildDeviceList();
+        this.log(`[WiFiPool][Driver] session.list_devices → ${list.length} device(s)`);
+        return list;
+      } catch (err) {
+        this.error('[WiFiPool][Driver] session.list_devices failed', err);
+        throw err; // let the frontend display the error
+      }
     });
 
     // For custom UIs that call Homey.emit('add_device')
@@ -56,6 +61,13 @@ export default class WiFiPoolDriver extends Homey.Driver {
       this.log('[WiFiPool][Driver] session disconnected');
       // optional: cleanup
     });
+
+    // Ensure a UI is shown that triggers one of the handlers above
+    try {
+      await session.showView('list_devices');
+    } catch (err) {
+      this.error('[WiFiPool][Driver] showView failed', err);
+    }
   }
 
   // ---- Build the list of pairable devices from app-level auto-setup
@@ -74,8 +86,14 @@ export default class WiFiPoolDriver extends Homey.Driver {
         io_map = found;
       } catch (err) {
         this.error('[WiFiPool][Driver] autoSetupCore failed', err);
-        return [];
+        throw new Error('Auto Setup failed. Check credentials and network in App Settings.');
       }
+    }
+
+    if (!domain || !device_uuid || !io_map) {
+      const err = new Error('Auto Setup did not provide complete data.');
+      this.error('[WiFiPool][Driver] incomplete auto-setup data', err);
+      throw err;
     }
 
     const name = this._makeName(io_map);
