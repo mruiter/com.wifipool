@@ -1,8 +1,6 @@
 {
   "id": "wifipool",
-  "name": {
-    "en": "WiFi Pool Sensor"
-  },
+  "name": { "en": "WiFi Pool Sensor" },
   "class": "sensor",
   "capabilities": [
     "measure_redox",
@@ -10,15 +8,14 @@
     "measure_flow",
     "alarm_health"
   ],
-  "connectivity": [
-    "cloud"
-  ],
+  "connectivity": ["cloud"],
   "pair": [
-    { "id": "list_devices" }
+    { "id": "start" }
   ],
   "images": {
     "small": "/drivers/wifipool/assets/images/small.jpg",
     "large": "/drivers/wifipool/assets/images/large.jpg",
     "xlarge": "/drivers/wifipool/assets/images/xlarge.jpg"
-  }
+  ],
+  "platforms": ["local", "cloud"]
 }
