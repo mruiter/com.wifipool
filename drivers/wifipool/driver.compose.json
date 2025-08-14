@@ -14,7 +14,7 @@
     "cloud"
   ],
   "pair": [
-    { "id": "start" }
+    { "id": "list_devices" }
   ],
   "images": {
     "small": "/drivers/wifipool/assets/images/small.jpg",

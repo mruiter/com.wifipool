@@ -21,7 +21,7 @@
         const list = document.getElementById('device-list');
         try {
           const devices = await Homey.emit('list_devices');
-          if (!devices.length) {
+          if (!Array.isArray(devices) || devices.length === 0) {
             status.textContent = 'No devices found.';
             return;
           }
