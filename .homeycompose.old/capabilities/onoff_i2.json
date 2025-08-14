@@ -1,9 +1,0 @@
-{
-  "type": "boolean",
-  "title": {
-    "en": "Switch i2"
-  },
-  "getable": true,
-  "setable": true,
-  "uiComponent": "toggle"
-}

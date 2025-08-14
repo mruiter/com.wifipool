@@ -10,6 +10,9 @@
   "category": [
     "tools"
   ],
+  "scripts": {
+    "test": "node test.js"
+  },
   "compatibility": ">=12.0.1",
   "sdk": 3,
   "brandColor": "#0b5ea8",
