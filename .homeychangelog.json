@@ -1,5 +1,8 @@
 {
   "1.0.0": {
     "en": "First release to appstore"
+  },
+  "1.0.1": {
+    "en": "Added translations."
   }
 }
