@@ -5,7 +5,7 @@
     "en": "WiFi Pool"
   },
   "description": {
-    "en": "WiFiPool integration with auto discovery of domain, sensors and switches."
+    "en": "WiFiPool integration for Homey."
   },
   "category": [
     "tools"
@@ -13,9 +13,20 @@
   "compatibility": ">=12.0.1",
   "sdk": 3,
   "brandColor": "#0b5ea8",
-  "version": "1.2.0",
+  "version": "1.0.0",
   "author": {
-    "name": "Marco Ruiter"
+    "name": "Marco Ruiter",
+	"email": "mruiter@eslaan24.nl"
+  },
+  "tags": {
+    "en": [
+      "pool",
+      "redhox",
+      "ph",
+      "flow",
+      "hottub",
+      "wifipool"
+    ]
   },
   "images": {
     "xlarge": "/assets/images/xlarge.png",
