@@ -1,6 +1,19 @@
 {
   "type": "boolean",
-  "title": { "en": "Flow detected" },
+  "title": {
+    "en": "Flow detected",
+    "nl": "Stroom gedetecteerd",
+    "da": "Strøm opdaget",
+    "de": "Fluss erkannt",
+    "es": "Flujo detectado",
+    "fr": "Flux détecté",
+    "it": "Flusso rilevato",
+    "no": "Flyt oppdaget",
+    "sv": "Flöde upptäckt",
+    "pl": "Wykryto przepływ",
+    "ru": "Поток обнаружен",
+    "ko": "흐름 감지됨"
+  },
   "getable": true,
   "setable": false,
   "uiComponent": "sensor",

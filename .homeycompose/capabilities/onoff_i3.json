@@ -1,7 +1,18 @@
 {
   "type": "boolean",
   "title": {
-    "en": "Switch i3"
+    "en": "Switch i3",
+    "nl": "Schakelaar i3",
+    "da": "Skift i3",
+    "de": "Schalter i3",
+    "es": "Interruptor i3",
+    "fr": "Interrupteur i3",
+    "it": "Interruttore i3",
+    "no": "Bryter i3",
+    "sv": "Brytare i3",
+    "pl": "Przełącznik i3",
+    "ru": "Переключатель i3",
+    "ko": "스위치 i3"
   },
   "getable": true,
   "setable": true,

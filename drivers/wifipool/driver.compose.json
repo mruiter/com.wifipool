@@ -1,11 +1,22 @@
 {
   "id": "wifipool",
   "name": {
-    "en": "WiFi Pool Sensor"
+    "en": "WiFi Pool Sensor",
+    "nl": "WiFi Pool Sensor",
+    "da": "WiFi Pool Sensor",
+    "de": "WiFi Pool Sensor",
+    "es": "Sensor de piscina WiFi",
+    "fr": "Capteur de piscine WiFi",
+    "it": "Sensore piscina WiFi",
+    "no": "WiFi Basseng Sensor",
+    "sv": "WiFi Pool Sensor",
+    "pl": "Czujnik WiFi do basenu",
+    "ru": "WiFi Датчик бассейна",
+    "ko": "WiFi 풀 센서"
   },
   "class": "sensor",
   "capabilities": [
-	"measure_temperature",
+    "measure_temperature",
     "measure_redox",
     "measure_ph",
     "alarm_flow",
@@ -33,10 +44,32 @@
       "id": "poll_interval",
       "type": "number",
       "label": {
-        "en": "Polling interval (seconds)"
+        "en": "Polling interval (seconds)",
+        "nl": "Polling-interval (seconden)",
+        "da": "Polling interval (sekunder)",
+        "de": "Abfrageintervall (Sekunden)",
+        "es": "Intervalo de sondeo (segundos)",
+        "fr": "Intervalle de sondage (secondes)",
+        "it": "Intervallo di polling (secondi)",
+        "no": "Pollingintervall (sekunder)",
+        "sv": "Pollningsintervall (sekunder)",
+        "pl": "Interwał sondowania (sekundy)",
+        "ru": "Интервал опроса (секунды)",
+        "ko": "폴링 간격 (초)"
       },
       "hint": {
-        "en": "How often to poll WiFiPool for new sensor values. Default: 60 seconds."
+        "en": "How often to poll WiFiPool for new sensor values. Default: 60 seconds.",
+        "nl": "Hoe vaak WiFiPool gepolst moet worden voor nieuwe sensorwaarden. Standaard: 60 seconden.",
+        "da": "Hvor ofte WiFiPool skal forespørges efter nye sensorværdier. Standard: 60 sekunder.",
+        "de": "Wie oft der WiFiPool nach neuen Sensorwerten abgefragt werden soll. Standard: 60 Sekunden.",
+        "es": "Con qué frecuencia sondear WiFiPool para obtener nuevos valores de sensores. Predeterminado: 60 segundos.",
+        "fr": "Fréquence de sondage du WiFiPool pour de nouvelles valeurs de capteur. Par défaut : 60 secondes.",
+        "it": "Con quale frequenza interrogare WiFiPool per nuovi valori del sensore. Predefinito: 60 secondi.",
+        "no": "Hvor ofte skal WiFiPool undersøkes for nye sensorverdier. Standard: 60 sekunder.",
+        "sv": "Hur ofta WiFiPool ska polas för nya sensorvärden. Standard: 60 sekunder.",
+        "pl": "Jak często sądować WiFiPool w poszukiwaniu nowych wartości czujnika. Domyślnie: 60 sekund.",
+        "ru": "Как часто опрашивать WiFiPool на наличие новых значений датчиков. По умолчанию: 60 секунд.",
+        "ko": "새 센서 값을 위해 WiFiPool을 폴링하는 빈도입니다. 기본값: 60초."
       },
       "min": 15,
       "max": 600,

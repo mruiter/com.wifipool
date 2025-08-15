@@ -3,7 +3,18 @@
     {
       "id": "flow_updated",
       "title": {
-        "en": "Flow updated"
+        "en": "Flow updated",
+        "nl": "Stroom bijgewerkt",
+        "da": "Flow opdateret",
+        "de": "Durchfluss aktualisiert",
+        "es": "Flujo actualizado",
+        "fr": "Débit mis à jour",
+        "it": "Flusso aggiornato",
+        "no": "Flyt oppdatert",
+        "sv": "Flöde uppdaterat",
+        "pl": "Przepływ zaktualizowany",
+        "ru": "Обновление потока",
+        "ko": "흐름 업데이트됨"
       },
       "args": [],
       "tokens": [
@@ -11,7 +22,18 @@
           "name": "flow",
           "type": "number",
           "title": {
-            "en": "Flow (L/min)"
+            "en": "Flow (L/min)",
+            "nl": "Stroom (L/min)",
+            "da": "Flow (L/min)",
+            "de": "Durchfluss (L/min)",
+            "es": "Flujo (L/min)",
+            "fr": "Débit (L/min)",
+            "it": "Flusso (L/min)",
+            "no": "Flyt (L/min)",
+            "sv": "Flöde (L/min)",
+            "pl": "Przepływ (L/min)",
+            "ru": "Поток (л/мин)",
+            "ko": "흐름 (L/min)"
           }
         }
       ]
@@ -19,7 +41,18 @@
     {
       "id": "health_changed",
       "title": {
-        "en": "Health changed"
+        "en": "Health changed",
+        "nl": "Gezondheid gewijzigd",
+        "da": "Sundhed ændret",
+        "de": "Gesundheit geändert",
+        "es": "Salud cambiada",
+        "fr": "Santé modifiée",
+        "it": "Salute cambiata",
+        "no": "Helse endret",
+        "sv": "Hälsa ändrad",
+        "pl": "Stan zdrowia zmieniony",
+        "ru": "Состояние здоровья изменено",
+        "ko": "건강 상태 변경됨"
       },
       "args": [],
       "tokens": [
@@ -27,7 +60,18 @@
           "name": "alarm",
           "type": "boolean",
           "title": {
-            "en": "Health alarm"
+            "en": "Health alarm",
+            "nl": "Gezondheidsalarm",
+            "da": "Sundhedsalarm",
+            "de": "Gesundheitsalarm",
+            "es": "Alarma de salud",
+            "fr": "Alarme santé",
+            "it": "Allarme salute",
+            "no": "Helsealarm",
+            "sv": "Hälsoalarm",
+            "pl": "Alarm zdrowia",
+            "ru": "Тревога здоровья",
+            "ko": "건강 경보"
           }
         }
       ]
@@ -35,7 +79,18 @@
     {
       "id": "ph_updated",
       "title": {
-        "en": "pH updated"
+        "en": "pH updated",
+        "nl": "pH bijgewerkt",
+        "da": "pH opdateret",
+        "de": "pH aktualisiert",
+        "es": "pH actualizado",
+        "fr": "pH mis à jour",
+        "it": "pH aggiornato",
+        "no": "pH oppdatert",
+        "sv": "pH uppdaterat",
+        "pl": "pH zaktualizowany",
+        "ru": "pH обновлён",
+        "ko": "pH 업데이트됨"
       },
       "args": [],
       "tokens": [
@@ -43,7 +98,18 @@
           "name": "ph",
           "type": "number",
           "title": {
-            "en": "pH"
+            "en": "pH",
+            "nl": "pH",
+            "da": "pH",
+            "de": "pH",
+            "es": "pH",
+            "fr": "pH",
+            "it": "pH",
+            "no": "pH",
+            "sv": "pH",
+            "pl": "pH",
+            "ru": "pH",
+            "ko": "pH"
           }
         }
       ]
@@ -51,7 +117,18 @@
     {
       "id": "redox_updated",
       "title": {
-        "en": "Redox updated"
+        "en": "Redox updated",
+        "nl": "Redox bijgewerkt",
+        "da": "Redox opdateret",
+        "de": "Redox aktualisiert",
+        "es": "Redox actualizado",
+        "fr": "Redox mis à jour",
+        "it": "Redox aggiornato",
+        "no": "Redoks oppdatert",
+        "sv": "Redox uppdaterat",
+        "pl": "Redoks zaktualizowany",
+        "ru": "Редокс обновлён",
+        "ko": "산화 환원 전위 업데이트됨"
       },
       "args": [],
       "tokens": [
@@ -59,7 +136,18 @@
           "name": "redox",
           "type": "number",
           "title": {
-            "en": "Redox (mV)"
+            "en": "Redox (mV)",
+            "nl": "Redox (mV)",
+            "da": "Redox (mV)",
+            "de": "Redox (mV)",
+            "es": "Redox (mV)",
+            "fr": "Redox (mV)",
+            "it": "Redox (mV)",
+            "no": "Redoks (mV)",
+            "sv": "Redox (mV)",
+            "pl": "Redoks (mV)",
+            "ru": "Редокс (мВ)",
+            "ko": "산화 환원 전위 (mV)"
           }
         }
       ]
@@ -69,7 +157,18 @@
     {
       "id": "flow_above",
       "title": {
-        "en": "Flow above ..."
+        "en": "Flow above ...",
+        "nl": "Stroom hoger dan ...",
+        "da": "Flow over ...",
+        "de": "Durchfluss über ...",
+        "es": "Flujo por encima de ...",
+        "fr": "Débit supérieur à ...",
+        "it": "Flusso sopra ...",
+        "no": "Flyt over ...",
+        "sv": "Flöde över ...",
+        "pl": "Przepływ powyżej ...",
+        "ru": "Поток выше ...",
+        "ko": "흐름이 ... 이상"
       },
       "args": [
         {
@@ -81,7 +180,18 @@
     {
       "id": "flow_below",
       "title": {
-        "en": "Flow below ..."
+        "en": "Flow below ...",
+        "nl": "Stroom lager dan ...",
+        "da": "Flow under ...",
+        "de": "Durchfluss unter ...",
+        "es": "Flujo por debajo de ...",
+        "fr": "Débit inférieur à ...",
+        "it": "Flusso sotto ...",
+        "no": "Flyt under ...",
+        "sv": "Flöde under ...",
+        "pl": "Przepływ poniżej ...",
+        "ru": "Поток ниже ...",
+        "ko": "흐름이 ... 이하"
       },
       "args": [
         {
@@ -93,14 +203,36 @@
     {
       "id": "health_ok",
       "title": {
-        "en": "Health OK"
+        "en": "Health OK",
+        "nl": "Gezondheid OK",
+        "da": "Sundhed OK",
+        "de": "Gesundheit OK",
+        "es": "Salud bien",
+        "fr": "Santé OK",
+        "it": "Salute OK",
+        "no": "Helse OK",
+        "sv": "Hälsa OK",
+        "pl": "Zdrowie OK",
+        "ru": "Состояние здоровья в норме",
+        "ko": "건강 이상 없음"
       },
       "args": []
     },
     {
       "id": "ph_above",
       "title": {
-        "en": "pH above ..."
+        "en": "pH above ...",
+        "nl": "pH hoger dan ...",
+        "da": "pH over ...",
+        "de": "pH über ...",
+        "es": "pH por encima de ...",
+        "fr": "pH supérieur à ...",
+        "it": "pH sopra ...",
+        "no": "pH over ...",
+        "sv": "pH över ...",
+        "pl": "pH powyżej ...",
+        "ru": "pH выше ...",
+        "ko": "pH가 ... 이상"
       },
       "args": [
         {
@@ -112,7 +244,18 @@
     {
       "id": "ph_below",
       "title": {
-        "en": "pH below ..."
+        "en": "pH below ...",
+        "nl": "pH lager dan ...",
+        "da": "pH under ...",
+        "de": "pH unter ...",
+        "es": "pH por debajo de ...",
+        "fr": "pH inférieur à ...",
+        "it": "pH sotto ...",
+        "no": "pH under ...",
+        "sv": "pH under ...",
+        "pl": "pH poniżej ...",
+        "ru": "pH ниже ...",
+        "ko": "pH가 ... 이하"
       },
       "args": [
         {
@@ -124,7 +267,18 @@
     {
       "id": "redox_above",
       "title": {
-        "en": "Redox above ..."
+        "en": "Redox above ...",
+        "nl": "Redox hoger dan ...",
+        "da": "Redox over ...",
+        "de": "Redox über ...",
+        "es": "Redox por encima de ...",
+        "fr": "Redox supérieur à ...",
+        "it": "Redox sopra ...",
+        "no": "Redoks over ...",
+        "sv": "Redox över ...",
+        "pl": "Redoks powyżej ...",
+        "ru": "Редокс выше ...",
+        "ko": "산화 환원 전위가 ... 이상"
       },
       "args": [
         {
@@ -136,7 +290,18 @@
     {
       "id": "redox_below",
       "title": {
-        "en": "Redox below ..."
+        "en": "Redox below ...",
+        "nl": "Redox lager dan ...",
+        "da": "Redox under ...",
+        "de": "Redox unter ...",
+        "es": "Redox por debajo de ...",
+        "fr": "Redox inférieur à ...",
+        "it": "Redox sotto ...",
+        "no": "Redoks under ...",
+        "sv": "Redox under ...",
+        "pl": "Redoks poniżej ...",
+        "ru": "Редокс ниже ...",
+        "ko": "산화 환원 전위가 ... 이하"
       },
       "args": [
         {
@@ -150,7 +315,18 @@
     {
       "id": "refresh_now",
       "title": {
-        "en": "Refresh WiFi Pool now"
+        "en": "Refresh WiFi Pool now",
+        "nl": "WiFi Pool nu verversen",
+        "da": "Opdater WiFi Pool nu",
+        "de": "WiFi-Pool jetzt aktualisieren",
+        "es": "Actualizar WiFi Pool ahora",
+        "fr": "Actualiser le WiFi Pool maintenant",
+        "it": "Aggiorna WiFi Pool ora",
+        "no": "Oppdater WiFi Pool nå",
+        "sv": "Uppdatera WiFi Pool nu",
+        "pl": "Odśwież WiFi Pool teraz",
+        "ru": "Обновить WiFi Pool сейчас",
+        "ko": "WiFi 풀을 지금 새로고침"
       },
       "args": []
     }

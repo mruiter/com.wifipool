@@ -1,7 +1,18 @@
 {
   "type": "boolean",
   "title": {
-    "en": "Switch i2"
+    "en": "Switch i2",
+    "nl": "Schakelaar i2",
+    "da": "Skift i2",
+    "de": "Schalter i2",
+    "es": "Interruptor i2",
+    "fr": "Interrupteur i2",
+    "it": "Interruttore i2",
+    "no": "Bryter i2",
+    "sv": "Brytare i2",
+    "pl": "Przełącznik i2",
+    "ru": "Переключатель i2",
+    "ko": "스위치 i2"
   },
   "getable": true,
   "setable": true,

@@ -1,7 +1,18 @@
 {
   "type": "boolean",
   "title": {
-    "en": "Health issue"
+    "en": "Health issue",
+    "nl": "Gezondheidsprobleem",
+    "da": "Sundhedsproblem",
+    "de": "Gesundheitsproblem",
+    "es": "Problema de salud",
+    "fr": "Problème de santé",
+    "it": "Problema di salute",
+    "no": "Helseproblem",
+    "sv": "Hälsoproblem",
+    "pl": "Problem zdrowotny",
+    "ru": "Проблема со здоровьем",
+    "ko": "건강 문제"
   },
   "uiComponent": "sensor",
   "getable": true,

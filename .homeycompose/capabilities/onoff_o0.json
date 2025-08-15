@@ -1,7 +1,18 @@
 {
   "type": "boolean",
   "title": {
-    "en": "Relay o0"
+    "en": "Relay o0",
+    "nl": "Relais o0",
+    "da": "Relæ o0",
+    "de": "Relais o0",
+    "es": "Relé o0",
+    "fr": "Relais o0",
+    "it": "Relè o0",
+    "no": "Relé o0",
+    "sv": "Relä o0",
+    "pl": "Przekaźnik o0",
+    "ru": "Реле o0",
+    "ko": "릴레이 o0"
   },
   "getable": true,
   "setable": true,

@@ -1,7 +1,18 @@
 {
   "type": "boolean",
   "title": {
-    "en": "Relay o2"
+    "en": "Relay o2",
+    "nl": "Schakelaar o2",
+    "da": "Relæ o2",
+    "de": "Relais o2",
+    "es": "Relé o2",
+    "fr": "Relais o2",
+    "it": "Relè o2",
+    "no": "Relé o2",
+    "sv": "Relä o2",
+    "pl": "Przekaźnik o2",
+    "ru": "Реле o2",
+    "ko": "릴레이 o2"
   },
   "getable": true,
   "setable": true,

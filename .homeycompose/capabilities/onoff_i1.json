@@ -1,7 +1,18 @@
 {
   "type": "boolean",
   "title": {
-    "en": "Switch i1"
+    "en": "Switch i1",
+    "nl": "Schakelaar i1",
+    "da": "Skift i1",
+    "de": "Schalter i1",
+    "es": "Interruptor i1",
+    "fr": "Interrupteur i1",
+    "it": "Interruttore i1",
+    "no": "Bryter i1",
+    "sv": "Brytare i1",
+    "pl": "Przełącznik i1",
+    "ru": "Переключатель i1",
+    "ko": "스위치 i1"
   },
   "getable": true,
   "setable": true,

@@ -1,7 +1,18 @@
 {
   "type": "boolean",
   "title": {
-    "en": "Switch i0"
+    "en": "Switch i0",
+    "nl": "Schakelaar i0",
+    "da": "Skift i0",
+    "de": "Schalter i0",
+    "es": "Interruptor i0",
+    "fr": "Interrupteur i0",
+    "it": "Interruttore i0",
+    "no": "Bryter i0",
+    "sv": "Brytare i0",
+    "pl": "Przełącznik i0",
+    "ru": "Переключатель i0",
+    "ko": "스위치 i0"
   },
   "getable": true,
   "setable": true,

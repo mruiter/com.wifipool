@@ -1,7 +1,18 @@
 {
   "type": "boolean",
   "title": {
-    "en": "Relay o1"
+    "en": "Relay o1",
+    "nl": "Relay o1",
+    "da": "Relay o1",
+    "de": "Relay o1",
+    "es": "Relay o1",
+    "fr": "Relay o1",
+    "it": "Relay o1",
+    "no": "Relay o1",
+    "sv": "Relay o1",
+    "pl": "Relay o1",
+    "ru": "Relay o1",
+    "ko": "Relay o1"
   },
   "getable": true,
   "setable": true,

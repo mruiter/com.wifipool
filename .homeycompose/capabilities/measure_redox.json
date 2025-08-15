@@ -1,14 +1,36 @@
 {
   "type": "number",
   "title": {
-    "en": "Redox"
+    "en": "Redox",
+    "nl": "Redox",
+    "da": "Redox",
+    "de": "Redox",
+    "es": "Redox",
+    "fr": "Redox",
+    "it": "Redox",
+    "no": "Redox",
+    "sv": "Redox",
+    "pl": "Redox",
+    "ru": "Редокс",
+    "ko": "산화환원"
   },
   "uiComponent": "sensor",
   "decimals": 0,
   "min": -2000,
   "max": 2000,
   "units": {
-    "en": "mV"
+    "en": "mV",
+    "nl": "mV",
+    "da": "mV",
+    "de": "mV",
+    "es": "mV",
+    "fr": "mV",
+    "it": "mV",
+    "no": "mV",
+    "sv": "mV",
+    "pl": "mV",
+    "ru": "мВ",
+    "ko": "mV"
   },
   "chartType": "spline",
   "getable": true,

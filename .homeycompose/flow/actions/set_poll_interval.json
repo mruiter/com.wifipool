@@ -1,7 +1,18 @@
 {
   "id": "set_poll_interval",
   "title": {
-    "en": "Set polling interval (seconds)"
+    "en": "Set polling interval (seconds)",
+    "nl": "Stel polling-interval in (seconden)",
+    "da": "Indstil polling-interval (sekunder)",
+    "de": "Abfrageintervall einstellen (Sekunden)",
+    "es": "Establecer intervalo de sondeo (segundos)",
+    "fr": "Définir l'intervalle de sondage (secondes)",
+    "it": "Imposta l'intervallo di polling (secondi)",
+    "no": "Sett polling-intervall (sekunder)",
+    "sv": "Ställ in polling-intervall (sekunder)",
+    "pl": "Ustaw interwał sondowania (sekundy)",
+    "ru": "Установить интервал опроса (секунды)",
+    "ko": "폴링 간격 설정 (초)"
   },
   "args": [
     {
