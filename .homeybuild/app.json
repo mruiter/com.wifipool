@@ -22,7 +22,7 @@
     "large": "/assets/images/large.png",
     "small": "/assets/images/small.png"
   },
-  "permissions": [  ],
+  "permissions": [],
   "api": {
     "autoSetup": {
       "method": "POST",
@@ -39,6 +39,33 @@
   },
   "esm": true,
   "flow": {
+    "actions": [
+      {
+        "id": "set_poll_interval",
+        "title": {
+          "en": "Set polling interval (seconds)"
+        },
+        "args": [
+          {
+            "name": "seconds",
+            "type": "number"
+          }
+        ]
+      },
+      {
+        "id": "refresh_now",
+        "title": {
+          "en": "Refresh WiFi Pool now"
+        },
+        "args": [
+          {
+            "type": "device",
+            "name": "device",
+            "filter": "driver_id=wifipool"
+          }
+        ]
+      }
+    ],
     "triggers": [
       {
         "id": "flow_updated",
@@ -47,8 +74,8 @@
         },
         "args": [
           {
-            "name": "device",
             "type": "device",
+            "name": "device",
             "filter": "driver_id=wifipool"
           }
         ],
@@ -69,8 +96,8 @@
         },
         "args": [
           {
-            "name": "device",
             "type": "device",
+            "name": "device",
             "filter": "driver_id=wifipool"
           }
         ],
@@ -91,8 +118,8 @@
         },
         "args": [
           {
-            "name": "device",
             "type": "device",
+            "name": "device",
             "filter": "driver_id=wifipool"
           }
         ],
@@ -113,8 +140,8 @@
         },
         "args": [
           {
-            "name": "device",
             "type": "device",
+            "name": "device",
             "filter": "driver_id=wifipool"
           }
         ],
@@ -137,8 +164,8 @@
         },
         "args": [
           {
-            "name": "device",
             "type": "device",
+            "name": "device",
             "filter": "driver_id=wifipool"
           },
           {
@@ -154,8 +181,8 @@
         },
         "args": [
           {
-            "name": "device",
             "type": "device",
+            "name": "device",
             "filter": "driver_id=wifipool"
           },
           {
@@ -171,8 +198,8 @@
         },
         "args": [
           {
-            "name": "device",
             "type": "device",
+            "name": "device",
             "filter": "driver_id=wifipool"
           }
         ]
@@ -184,8 +211,8 @@
         },
         "args": [
           {
-            "name": "device",
             "type": "device",
+            "name": "device",
             "filter": "driver_id=wifipool"
           },
           {
@@ -201,8 +228,8 @@
         },
         "args": [
           {
-            "name": "device",
             "type": "device",
+            "name": "device",
             "filter": "driver_id=wifipool"
           },
           {
@@ -218,8 +245,8 @@
         },
         "args": [
           {
-            "name": "device",
             "type": "device",
+            "name": "device",
             "filter": "driver_id=wifipool"
           },
           {
@@ -235,8 +262,8 @@
         },
         "args": [
           {
-            "name": "device",
             "type": "device",
+            "name": "device",
             "filter": "driver_id=wifipool"
           },
           {
@@ -245,38 +272,10 @@
           }
         ]
       }
-    ],
-    "actions": [
-      {
-        "id": "refresh_now",
-        "title": {
-          "en": "Refresh WiFi Pool now"
-        },
-        "args": [
-          {
-            "name": "device",
-            "type": "device",
-            "filter": "driver_id=wifipool"
-          }
-        ]
-      },
-      {
-        "id": "set_poll_interval",
-        "title": {
-          "en": "Set polling interval (seconds)"
-        },
-        "args": [
-          {
-            "name": "seconds",
-            "type": "number"
-          }
-        ]
-      }
     ]
   },
   "drivers": [
     {
-      "id": "wifipool",
       "name": {
         "en": "WiFi Pool Sensor"
       },
@@ -303,7 +302,8 @@
       "platforms": [
         "local",
         "cloud"
-      ]
+      ],
+      "id": "wifipool"
     }
   ],
   "capabilities": {
@@ -312,46 +312,64 @@
       "title": {
         "en": "Health issue"
       },
+      "uiComponent": "sensor",
       "getable": true,
       "setable": false,
-      "uiComponent": "sensor",
-      "icon": "/assets/capabilities/alarm.svg"
+      "insights": true,
+      "icon": "/assets/wifipool/icons/health.svg"
     },
     "measure_flow": {
       "type": "number",
-      "units": {
-        "en": "L/min"
-      },
       "title": {
         "en": "Flow"
       },
+      "uiComponent": "sensor",
+      "decimals": 2,
+      "min": 0,
+      "max": 1000,
+      "units": {
+        "en": "L/min"
+      },
+      "chartType": "spline",
       "getable": true,
       "setable": false,
-      "uiComponent": "sensor",
-      "decimals": 1
+      "insights": true,
+      "icon": "/assets/wifipool/icons/flow.svg"
     },
     "measure_ph": {
       "type": "number",
       "title": {
         "en": "pH"
       },
+      "uiComponent": "sensor",
+      "decimals": 2,
+      "min": 0,
+      "max": 14,
+      "units": {
+        "en": "pH"
+      },
+      "chartType": "spline",
       "getable": true,
       "setable": false,
-      "uiComponent": "sensor",
-      "decimals": 2
+      "insights": true
     },
     "measure_redox": {
       "type": "number",
-      "units": {
-        "en": "mV"
-      },
       "title": {
         "en": "Redox"
       },
+      "uiComponent": "sensor",
+      "decimals": 0,
+      "min": -2000,
+      "max": 2000,
+      "units": {
+        "en": "mV"
+      },
+      "chartType": "spline",
       "getable": true,
       "setable": false,
-      "uiComponent": "sensor",
-      "decimals": 0
+      "insights": true,
+      "icon": "/assets/wifipool/icons/redox.svg"
     },
     "onoff_i0": {
       "type": "boolean",

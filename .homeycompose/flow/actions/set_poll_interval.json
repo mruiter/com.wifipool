@@ -1,0 +1,12 @@
+{
+  "id": "set_poll_interval",
+  "title": {
+    "en": "Set polling interval (seconds)"
+  },
+  "args": [
+    {
+      "name": "seconds",
+      "type": "number"
+    }
+  ]
+}

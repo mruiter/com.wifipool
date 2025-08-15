@@ -1,0 +1,158 @@
+{
+  "triggers": [
+    {
+      "id": "flow_updated",
+      "title": {
+        "en": "Flow updated"
+      },
+      "args": [],
+      "tokens": [
+        {
+          "name": "flow",
+          "type": "number",
+          "title": {
+            "en": "Flow (L/min)"
+          }
+        }
+      ]
+    },
+    {
+      "id": "health_changed",
+      "title": {
+        "en": "Health changed"
+      },
+      "args": [],
+      "tokens": [
+        {
+          "name": "alarm",
+          "type": "boolean",
+          "title": {
+            "en": "Health alarm"
+          }
+        }
+      ]
+    },
+    {
+      "id": "ph_updated",
+      "title": {
+        "en": "pH updated"
+      },
+      "args": [],
+      "tokens": [
+        {
+          "name": "ph",
+          "type": "number",
+          "title": {
+            "en": "pH"
+          }
+        }
+      ]
+    },
+    {
+      "id": "redox_updated",
+      "title": {
+        "en": "Redox updated"
+      },
+      "args": [],
+      "tokens": [
+        {
+          "name": "redox",
+          "type": "number",
+          "title": {
+            "en": "Redox (mV)"
+          }
+        }
+      ]
+    }
+  ],
+  "conditions": [
+    {
+      "id": "flow_above",
+      "title": {
+        "en": "Flow above ..."
+      },
+      "args": [
+        {
+          "name": "threshold",
+          "type": "number"
+        }
+      ]
+    },
+    {
+      "id": "flow_below",
+      "title": {
+        "en": "Flow below ..."
+      },
+      "args": [
+        {
+          "name": "threshold",
+          "type": "number"
+        }
+      ]
+    },
+    {
+      "id": "health_ok",
+      "title": {
+        "en": "Health OK"
+      },
+      "args": []
+    },
+    {
+      "id": "ph_above",
+      "title": {
+        "en": "pH above ..."
+      },
+      "args": [
+        {
+          "name": "threshold",
+          "type": "number"
+        }
+      ]
+    },
+    {
+      "id": "ph_below",
+      "title": {
+        "en": "pH below ..."
+      },
+      "args": [
+        {
+          "name": "threshold",
+          "type": "number"
+        }
+      ]
+    },
+    {
+      "id": "redox_above",
+      "title": {
+        "en": "Redox above ..."
+      },
+      "args": [
+        {
+          "name": "threshold",
+          "type": "number"
+        }
+      ]
+    },
+    {
+      "id": "redox_below",
+      "title": {
+        "en": "Redox below ..."
+      },
+      "args": [
+        {
+          "name": "threshold",
+          "type": "number"
+        }
+      ]
+    }
+  ],
+  "actions": [
+    {
+      "id": "refresh_now",
+      "title": {
+        "en": "Refresh WiFi Pool now"
+      },
+      "args": []
+    }
+  ]
+}

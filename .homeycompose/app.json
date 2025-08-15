@@ -1,0 +1,41 @@
+{
+  "_comment": "This file is generated. Please edit .homeycompose/app.json instead.",
+  "id": "com.wifipool",
+  "name": {
+    "en": "WiFi Pool"
+  },
+  "description": {
+    "en": "WiFiPool integration with auto discovery of domain, sensors and switches."
+  },
+  "category": [
+    "tools"
+  ],
+  "compatibility": ">=12.0.1",
+  "sdk": 3,
+  "brandColor": "#0b5ea8",
+  "version": "1.2.0",
+  "author": {
+    "name": "Marco Ruiter"
+  },
+  "images": {
+    "xlarge": "/assets/images/xlarge.png",
+    "large": "/assets/images/large.png",
+    "small": "/assets/images/small.png"
+  },
+  "permissions": [],
+  "api": {
+    "autoSetup": {
+      "method": "POST",
+      "path": "/autosetup"
+    },
+    "discoverIos": {
+      "method": "POST",
+      "path": "/discover"
+    },
+    "testApi": {
+      "method": "POST",
+      "path": "/test"
+    }
+  },
+  "esm": true
+}

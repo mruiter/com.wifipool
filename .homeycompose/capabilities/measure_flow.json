@@ -1,18 +1,18 @@
 {
   "type": "number",
   "title": {
-    "en": "Redox"
+    "en": "Flow"
   },
   "uiComponent": "sensor",
-  "decimals": 0,
-  "min": -2000,
-  "max": 2000,
+  "decimals": 2,
+  "min": 0,
+  "max": 1000,
   "units": {
-    "en": "mV"
+    "en": "L/min"
   },
   "chartType": "spline",
   "getable": true,
   "setable": false,
   "insights": true,
-  "icon": "/assets/icons/redox.svg"
+  "icon": "/assets/wifipool/icons/flow.svg"
 }

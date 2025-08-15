@@ -7,5 +7,5 @@
   "getable": true,
   "setable": false,
   "insights": true,
-  "icon": "/assets/icons/health.svg"
+  "icon": "/assets/wifipool/icons/health.svg"
 }
