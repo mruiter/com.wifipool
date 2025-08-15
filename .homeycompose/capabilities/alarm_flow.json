@@ -1,8 +1,6 @@
 {
-  "title": {
-    "en": "Flow"
-  },
   "type": "boolean",
+  "title": { "en": "Flow detected" },
   "getable": true,
   "setable": false,
   "uiComponent": "sensor",
