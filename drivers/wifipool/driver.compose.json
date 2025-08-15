@@ -8,7 +8,7 @@
 	"measure_temperature",
     "measure_redox",
     "measure_ph",
-    "measure_flow",
+    "alarm_flow",
     "alarm_health"
   ],
   "connectivity": [
@@ -16,7 +16,7 @@
   ],
   "pair": [
     {
-      "id": "list_devices"
+      "id": "start"
     }
   ],
   "images": {

@@ -1,0 +1,11 @@
+{
+  "title": {
+    "en": "Flow"
+  },
+  "type": "boolean",
+  "getable": true,
+  "setable": false,
+  "uiComponent": "sensor",
+  "insights": true,
+  "icon": "/assets/wifipool/icons/flow.svg"
+}

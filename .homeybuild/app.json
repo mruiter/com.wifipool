@@ -285,7 +285,7 @@
         "measure_temperature",
         "measure_redox",
         "measure_ph",
-        "measure_flow",
+        "alarm_flow",
         "alarm_health"
       ],
       "connectivity": [
@@ -293,7 +293,7 @@
       ],
       "pair": [
         {
-          "id": "list_devices"
+          "id": "start"
         }
       ],
       "images": {
@@ -324,6 +324,17 @@
     }
   ],
   "capabilities": {
+    "alarm_flow": {
+      "title": {
+        "en": "Flow"
+      },
+      "type": "boolean",
+      "getable": true,
+      "setable": false,
+      "uiComponent": "sensor",
+      "insights": true,
+      "icon": "/assets/wifipool/icons/flow.svg"
+    },
     "alarm_health": {
       "type": "boolean",
       "title": {
@@ -334,24 +345,6 @@
       "setable": false,
       "insights": true,
       "icon": "/assets/wifipool/icons/health.svg"
-    },
-    "measure_flow": {
-      "type": "number",
-      "title": {
-        "en": "Flow"
-      },
-      "uiComponent": "sensor",
-      "decimals": 2,
-      "min": 0,
-      "max": 1000,
-      "units": {
-        "en": "L/min"
-      },
-      "chartType": "spline",
-      "getable": true,
-      "setable": false,
-      "insights": true,
-      "icon": "/assets/wifipool/icons/flow.svg"
     },
     "measure_ph": {
       "type": "number",
