@@ -1,9 +1,11 @@
 {
+  "id": "wifipool",
   "name": {
     "en": "WiFi Pool Sensor"
   },
   "class": "sensor",
   "capabilities": [
+	"measure_temperature",
     "measure_redox",
     "measure_ph",
     "measure_flow",
@@ -14,7 +16,7 @@
   ],
   "pair": [
     {
-      "id": "start"
+      "id": "list_devices"
     }
   ],
   "images": {
@@ -25,5 +27,21 @@
   "platforms": [
     "local",
     "cloud"
+  ],
+  "settings": [
+    {
+      "id": "poll_interval",
+      "type": "number",
+      "label": {
+        "en": "Polling interval (seconds)"
+      },
+      "hint": {
+        "en": "How often to poll WiFiPool for new sensor values. Default: 60 seconds."
+      },
+      "min": 15,
+      "max": 600,
+      "step": 5,
+      "value": 60
+    }
   ]
 }

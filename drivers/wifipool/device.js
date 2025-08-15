@@ -4,253 +4,110 @@ import fetch from 'node-fetch';
 
 const BASE = 'https://api.wifipool.eu/native_mobile';
 
+// Capabilities we expect on this device
+const REQUIRED_CAPS = [
+  'measure_ph',
+  'measure_redox',
+  'measure_flow',
+  'measure_temperature',
+  'alarm_health',
+];
+
 export default class WiFiPoolDevice extends Homey.Device {
   async onInit() {
-    this.log('[WiFiPool][Device] init');
+    this.log('[WiFiPool][Device] init:', this.getName());
 
-    this._cookie = null;
-    this._afterByIo = Object.create(null); // per-IO watermark
-    this._pollTimer = null;
+    // Ensure capabilities exist for already-paired devices
+    await this._ensureCapabilities(REQUIRED_CAPS);
 
-    // Default poll interval (seconds)
+    // default poll interval if missing
     if (this.getSetting('poll_interval') == null) {
       await this.setSettings({ poll_interval: 60 });
     }
 
-    const store = this.getStore() || {};
-    if (!store.domain || !store.io_map) {
-      this.error('[WiFiPool][Device] Missing domain/io_map in device store. Complete pairing first.');
-      await this.setUnavailable('Not configured');
-      return;
-    } else {
-      await this.setAvailable();
-    }
+    this._cookie = null;
+    this._cookieUntil = 0;
+    this._pollTimer = null;
 
-    await this._restartPolling();
+    this._startPolling();
   }
 
-  async onUninit() { this._clearPollTimer(); }
-  async onAdded() { this.log('[WiFiPool][Device] added'); }
-  async onDeleted() { this._clearPollTimer(); this.log('[WiFiPool][Device] deleted'); }
+  async onAdded() {
+    this._startPolling();
+  }
 
-  async onSettings({ changedKeys, newSettings }) {
+  async onDeleted() {
+    this._stopPolling();
+  }
+
+  async onSettings({ oldSettings, newSettings, changedKeys }) {
     if (changedKeys.includes('poll_interval')) {
-      this.log(`[WiFiPool][Device] Polling interval -> ${newSettings.poll_interval}s`);
+      this.log('[WiFiPool][Device] poll_interval changed -> restart polling');
       await this._restartPolling();
     }
   }
 
-  // ---- Polling ---------------------------------------------------------------
+  // ---- Capabilities guard (auto-add when missing)
+  async _ensureCapabilities(list) {
+    for (const cap of list) {
+      if (!this.hasCapability(cap)) {
+        try {
+          await this.addCapability(cap);
+          this.log(`[WiFiPool][Device] added missing capability: ${cap}`);
+        } catch (e) {
+          this.error(`[WiFiPool][Device] failed to add capability ${cap}:`, e?.message || e);
+        }
+      }
+    }
+  }
 
-  _clearPollTimer() {
+  // ----- Polling -----
+  _startPolling() {
+    this._stopPolling();
+    const intervalSec = Number(this.getSetting('poll_interval')) || 60;
+    // clamp to something reasonable
+    const iv = Math.max(15, Math.min(600, intervalSec)) * 1000;
+    this.log('[WiFiPool][Device] start polling every', iv / 1000, 's');
+
+    // immediate poll, then interval
+    this._pollOnce().catch(err =>
+      this.error('[WiFiPool][Device] initial poll error:', err?.message || err)
+    );
+    this._pollTimer = setInterval(() => {
+      this._pollOnce().catch(err =>
+        this.error('[WiFiPool][Device] poll error:', err?.message || err)
+      );
+    }, iv);
+  }
+
+  _stopPolling() {
     if (this._pollTimer) {
-      this.homey.clearInterval(this._pollTimer);
+      clearInterval(this._pollTimer);
       this._pollTimer = null;
     }
   }
 
-  _getIntervalMs() {
-    const sec = Number(this.getSetting('poll_interval')) || 60;
-    const clamped = Math.max(10, Math.min(sec, 3600));
-    return clamped * 1000;
-  }
-
   async _restartPolling() {
-    this._clearPollTimer();
-
-    try {
-      await this._pollOnce(); // immediate
-    } catch (err) {
-      this.error('[WiFiPool][Device] Initial poll failed:', err?.message || err);
-    }
-
-    this._pollTimer = this.homey.setInterval(async () => {
-      try {
-        await this._pollOnce();
-      } catch (err) {
-        this.error('[WiFiPool][Device] Poll failed:', err?.message || err);
-      }
-    }, this._getIntervalMs());
+    this._stopPolling();
+    this._startPolling();
   }
 
-  // ---- Core poll -------------------------------------------------------------
-
-  async _pollOnce() {
-    const { domain, io_map } = this.getStore() || {};
-    if (!domain || !io_map) {
-      await this.setUnavailable('Not configured');
-      return;
-    }
-
-    try {
-      await this._ensureLogin();
-
-      // pH (analog)
-      if (io_map.ph?.io && io_map.ph?.key && this.hasCapability('measure_ph')) {
-        const v = await this._fetchAnalogLatest(domain, io_map.ph.io, io_map.ph.key);
-        if (v != null && Number.isFinite(v)) {
-          await this._safeSetCapabilityValue('measure_ph', Number(v));
-        }
-      }
-
-      // Redox / ORP (analog)
-      if (io_map.redox?.io && io_map.redox?.key && this.hasCapability('measure_redox')) {
-        const v = await this._fetchAnalogLatest(domain, io_map.redox.io, io_map.redox.key);
-        if (v != null && Number.isFinite(v)) {
-          await this._safeSetCapabilityValue('measure_redox', Number(v));
-        }
-      }
-
-      // Flow (analog or power fallback)
-      if (io_map.flow?.io && io_map.flow?.key && this.hasCapability('measure_flow')) {
-        const v = await this._fetchAnalogLatest(domain, io_map.flow.io, io_map.flow.key);
-        if (v != null && Number.isFinite(v)) {
-          await this._safeSetCapabilityValue('measure_flow', Number(v));
-        }
-      }
-
-      // Temperature (DS18B20)
-      if (io_map.temperature?.io && io_map.temperature?.key && this.hasCapability('measure_temperature')) {
-        const t = await this._fetchDs18b20Latest(domain, io_map.temperature.io, io_map.temperature.key);
-        if (t != null && Number.isFinite(t)) {
-          await this._safeSetCapabilityValue('measure_temperature', Number(t));
-        }
-      }
-
-      if (this.hasCapability('alarm_health')) {
-        await this._safeSetCapabilityValue('alarm_health', false);
-      }
-      await this.setAvailable();
-    } catch (err) {
-      const msg = String(err?.message || err);
-      this.error('[WiFiPool][Device] poll error:', msg);
-
-      // Re-login on auth issues
-      if (msg.includes('401') || msg.toLowerCase().includes('unauthorized')) {
-        this._cookie = null;
-      }
-      if (this.hasCapability('alarm_health')) {
-        await this._safeSetCapabilityValue('alarm_health', true);
-      }
-      if (/Not configured/i.test(msg)) {
-        await this.setUnavailable('Not configured');
-      } else {
-        await this.setAvailable(); // remain available; show alarm
-      }
-    }
-  }
-
-  // ---- WiFiPool helpers ------------------------------------------------------
-
-  async _ensureLogin() {
-    if (this._cookie) return;
-
-    const email = this.homey.settings.get('email');
-    const password = this.homey.settings.get('password');
-    if (!email || !password) throw new Error('Not configured: missing email/password in App Settings');
-
-    const res = await this._httpRequest('POST', '/users/login', {
-      body: { email, namespace: 'default', password },
-    });
-    if (res.status !== 200) throw new Error(`Login failed: HTTP ${res.status}`);
-
-    const cookie = this._extractSessionCookie(res.setCookie);
-    if (!cookie) throw new Error('Login OK but no connect.sid cookie received');
-
-    this._cookie = cookie;
-    this.log('[WiFiPool][Device] Login OK, session cookie set');
-  }
-
-  async _fetchAnalogLatest(domain, io, key) {
-    const arr = await this._getStatsLatest(domain, io);
-    if (!arr) return null;
-
-    // Prefer analog[key]
-    for (let i = arr.length - 1; i >= 0; i -= 1) {
-      const v = arr[i]?.device_sensor_data?.analog?.[key];
-      if (v != null && Number.isFinite(Number(v))) return Number(v);
-    }
-    // Fallback: power[key]
-    for (let i = arr.length - 1; i >= 0; i -= 1) {
-      const v = arr[i]?.device_state_data?.power?.[key];
-      if (v != null && Number.isFinite(Number(v))) return Number(v);
-    }
-    return null;
-  }
-
-  async _fetchDs18b20Latest(domain, io, key) {
-    const arr = await this._getStatsLatest(domain, io);
-    if (!arr) return null;
-
-    for (let i = arr.length - 1; i >= 0; i -= 1) {
-      const node = arr[i]?.device_sensor_data?.ds18b20?.[key];
-      const temp = node?.temperature;
-      if (temp != null && Number.isFinite(Number(temp))) return Number(temp);
-    }
-    return null;
-  }
-
-  /**
-   * Get stats for an IO with a robust "after" policy:
-   *  - First try with millisecond epoch
-   *  - If the server returns [] (or nothing), retry with second epoch
-   *  - Advance the watermark to "now" after any successful call
-   */
-  async _getStatsLatest(domain, io) {
-    // Initial watermark: 24h lookback
-    const initialAfterMs = this._afterByIo[io] ?? (Date.now() - 24 * 60 * 60 * 1000);
-
-    // Attempt 1: after in milliseconds
-    let arr = await this._callGetStats(domain, io, initialAfterMs);
-    if (Array.isArray(arr) && arr.length === 0) {
-      // Attempt 2: after in seconds
-      const sec = Math.floor(initialAfterMs / 1000);
-      arr = await this._callGetStats(domain, io, sec);
-    }
-
-    // Advance watermark for next poll cycle
-    this._afterByIo[io] = Date.now();
-    return arr;
-  }
-
-  async _callGetStats(domain, io, after) {
-    const res = await this._httpRequest('POST', '/harmopool/getStats', {
-      cookie: this._cookie,
-      body: { domain, io, after },
-    });
-
-    if (res.status === 404) {
-      this.log(`[WiFiPool][Device] getStats 404 for io=${io}: ${res.text || 'Unknown io'}`);
-      return []; // treat as empty (skip)
-    }
-    if (res.status !== 200) {
-      throw new Error(`getStats failed for ${io}: HTTP ${res.status}`);
-    }
-    if (!Array.isArray(res.json)) return [];
-    return res.json;
-  }
-
+  // ----- HTTP helpers -----
   async _httpRequest(method, resource, { body, cookie } = {}) {
     const url = `${BASE}${resource}`;
     const headers = { 'Content-Type': 'application/json' };
     if (cookie) headers.Cookie = cookie;
 
-    const t0 = Date.now();
-    const res = await fetch(url, { method, headers, body: body ? JSON.stringify(body) : undefined });
-    const ms = Date.now() - t0;
+    const res = await fetch(url, {
+      method,
+      headers,
+      body: body ? JSON.stringify(body) : undefined,
+    });
 
-    const setCookie = res.headers?.raw?.()['set-cookie'] || res.headers.get?.('set-cookie') || null;
     const text = await res.text();
-    let json; try { json = text ? JSON.parse(text) : undefined; } catch { /* ignore */ }
-
-    this.log(`[WiFiPool][HTTP] ${method} ${resource} -> ${res.status} in ${ms}ms`);
-    if (res.status === 200 && Array.isArray(json)) {
-      this.log(`[WiFiPool][HTTP] ${resource} items: ${json.length}`);
-    } else if (res.status >= 400) {
-      this.log(`[WiFiPool][HTTP] ${resource} error body: ${(text || '').slice(0, 200)}`);
-    }
-
-    return { status: res.status, json, text, setCookie, timeMs: ms };
+    let json;
+    try { json = text ? JSON.parse(text) : undefined; } catch { json = undefined; }
+    return { status: res.status, json, text, headers: res.headers };
   }
 
   _extractSessionCookie(setCookie) {
@@ -263,15 +120,125 @@ export default class WiFiPoolDevice extends Homey.Device {
     return null;
   }
 
-  async _safeSetCapabilityValue(cap, value) {
-    if (!this.hasCapability(cap)) return;
-    try {
-      const current = await this.getCapabilityValue(cap);
-      if (current !== value) {
-        await this.setCapabilityValue(cap, value);
-      }
-    } catch (e) {
-      this.error(`[WiFiPool][Device] setCapabilityValue(${cap}) failed:`, e?.message || e);
+  async _ensureLogin() {
+    const now = Date.now();
+    if (this._cookie && now < this._cookieUntil) {
+      return this._cookie;
     }
+    const email = this.homey.settings.get('email');
+    const password = this.homey.settings.get('password');
+    if (!email || !password) throw new Error('Email/Password not configured in App Settings');
+
+    const r = await this._httpRequest('POST', '/users/login', {
+      body: { email, namespace: 'default', password }
+    });
+    if (r.status !== 200) throw new Error(`Login failed: HTTP ${r.status}`);
+    const rawSetCookie = r.headers?.raw?.()['set-cookie'] || r.headers?.get?.('set-cookie');
+    const cookie = this._extractSessionCookie(rawSetCookie);
+    if (!cookie) throw new Error('No connect.sid cookie returned');
+    // Cache cookie for ~15 min
+    this._cookie = cookie;
+    this._cookieUntil = now + 15 * 60 * 1000;
+    return cookie;
+  }
+
+  async _getStats(domain, io, after = 0) {
+    const cookie = await this._ensureLogin();
+    const r = await this._httpRequest('POST', '/harmopool/getStats', {
+      cookie, body: { domain, io, after }
+    });
+    if (r.status === 404) {
+      this.log('[WiFiPool][Device] unknown io ->', io);
+      return [];
+    }
+    if (r.status !== 200) throw new Error(`getStats failed ${io}: HTTP ${r.status}`);
+    return Array.isArray(r.json) ? r.json : [];
+  }
+
+  // ----- Data extraction helpers -----
+  _latestAnalog(arr) {
+    for (let i = arr.length - 1; i >= 0; i--) {
+      const it = arr[i];
+      const d = it?.device_sensor_data?.analog;
+      if (d) {
+        const k = Object.keys(d)[0];
+        const v = Number(d[k]);
+        if (Number.isFinite(v)) return v;
+      }
+    }
+    return null;
+  }
+
+  _latestTemperature(arr) {
+    for (let i = arr.length - 1; i >= 0; i--) {
+      const d = arr[i]?.device_sensor_data?.ds18b20;
+      if (d) {
+        const key = Object.keys(d)[0];
+        const v = Number(d[key]?.temperature);
+        if (Number.isFinite(v)) return v;
+      }
+    }
+    return null;
+  }
+
+  // ----- One poll round -----
+  async _pollOnce() {
+    const store = this.getStore() || {};
+    const domain = store.domain;
+    const io_map = store.io_map || {};
+
+    if (!domain || !io_map) {
+      this.log('[WiFiPool][Device] missing domain/io_map in store — skip poll');
+      await this.setCapabilityValue('alarm_health', true).catch(() => {});
+      return;
+    }
+
+    let ok = true;
+
+    // pH
+    if (io_map.ph?.io) {
+      try {
+        const arr = await this._getStats(domain, io_map.ph.io, 0);
+        const v = this._latestAnalog(arr);
+        if (v != null && this.hasCapability('measure_ph')) {
+          await this.setCapabilityValue('measure_ph', v);
+        }
+      } catch (e) { ok = false; this.error('pH poll error:', e?.message || e); }
+    }
+
+    // Redox (ORP)
+    if (io_map.redox?.io) {
+      try {
+        const arr = await this._getStats(domain, io_map.redox.io, 0);
+        const v = this._latestAnalog(arr);
+        if (v != null && this.hasCapability('measure_redox')) {
+          await this.setCapabilityValue('measure_redox', v);
+        }
+      } catch (e) { ok = false; this.error('redox poll error:', e?.message || e); }
+    }
+
+    // Flow
+    if (io_map.flow?.io) {
+      try {
+        const arr = await this._getStats(domain, io_map.flow.io, 0);
+        const v = this._latestAnalog(arr);
+        if (v != null && this.hasCapability('measure_flow')) {
+          await this.setCapabilityValue('measure_flow', v);
+        }
+      } catch (e) { ok = false; this.error('flow poll error:', e?.message || e); }
+    }
+
+    // Temperature (DS18B20)
+    if (io_map.temperature?.io) {
+      try {
+        const arr = await this._getStats(domain, io_map.temperature.io, 0);
+        const t = this._latestTemperature(arr);
+        if (t != null && this.hasCapability('measure_temperature')) {
+          await this.setCapabilityValue('measure_temperature', t);
+        }
+      } catch (e) { ok = false; this.error('temperature poll error:', e?.message || e); }
+    }
+
+    await this.setCapabilityValue('alarm_health', !ok).catch(() => {});
   }
 }
