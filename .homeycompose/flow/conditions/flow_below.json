@@ -1,0 +1,42 @@
+{
+  "id": "flow_below",
+  "title": {
+    "en": "The Flow is below ...",
+    "nl": "De stroom is hieronder ...",
+    "da": "Flowet er nedenfor ...",
+    "de": "Der Fluss ist unten ...",
+    "es": "El flujo está abajo ...",
+    "fr": "Le flux est en dessous ...",
+    "it": "Il flusso è sotto ...",
+    "no": "Flyten er under ...",
+    "sv": "Flödet är nedanför ...",
+    "pl": "Przepływ jest poniżej ...",
+    "ru": "Поток ниже ...",
+    "ko": "흐름은 아래 ...입니다"
+  },
+  "args": [
+    {
+      "type": "device",
+      "name": "device",
+      "filter": "driver_id=wifipool"
+    },
+    {
+      "name": "threshold",
+      "type": "number"
+    }
+  ],
+  "titleFormatted": {
+    "en": "Flow below [[threshold]]",
+    "nl": "Flow lager dan [[threshold]]",
+    "da": "Flow under [[threshold]]",
+    "de": "Fluss unter [[threshold]]",
+    "es": "Flujo por debajo de [[threshold]]",
+    "fr": "Flux inférieur à [[threshold]]",
+    "it": "Flusso sotto [[threshold]]",
+    "no": "Flyt under [[threshold]]",
+    "sv": "Flöde under [[threshold]]",
+    "pl": "Przepływ poniżej [[threshold]]",
+    "ru": "Поток ниже [[threshold]]",
+    "ko": "[[threshold]] 미만의 흐름"
+  }
+}

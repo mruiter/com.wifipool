@@ -19,5 +19,19 @@
       "name": "seconds",
       "type": "number"
     }
-  ]
+  ],
+  "titleFormatted": {
+    "en": "Set polling interval to [[seconds]] s",
+    "nl": "Stel polling-interval in op [[seconds]] s",
+    "da": "Indstil polling-interval til [[seconds]] s",
+    "de": "Abfrageintervall auf [[seconds]] s einstellen",
+    "es": "Establecer intervalo de sondeo a [[seconds]] s",
+    "fr": "Définir l'intervalle de sondage sur [[seconds]] s",
+    "it": "Imposta l'intervallo di polling a [[seconds]] s",
+    "no": "Sett polling-intervall til [[seconds]] s",
+    "sv": "Ställ in polling-intervall till [[seconds]] s",
+    "pl": "Ustaw interwał sondowania na [[seconds]] s",
+    "ru": "Установить интервал опроса на [[seconds]] с",
+    "ko": "폴링 간격을 [[seconds]]초로 설정"
+  }
 }

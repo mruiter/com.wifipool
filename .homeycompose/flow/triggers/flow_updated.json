@@ -1,0 +1,44 @@
+{
+  "id": "flow_updated",
+  "title": {
+    "en": "Flow status changed",
+    "nl": "Stroomstatus gewijzigd",
+    "da": "Flowstatus ændret",
+    "de": "Durchflussstatus geändert",
+    "es": "Estado de flujo cambiado",
+    "fr": "Statut de débit modifié",
+    "it": "Stato di flusso cambiato",
+    "no": "Strømstatus endret",
+    "sv": "Flödets status ändrad",
+    "pl": "Status przepływu został zmieniony",
+    "ru": "Статус потока изменен",
+    "ko": "흐름 상태 변경됨"
+  },
+  "args": [
+    {
+      "type": "device",
+      "name": "device",
+      "filter": "driver_id=wifipool"
+    }
+  ],
+  "tokens": [
+    {
+      "name": "flow",
+      "type": "number",
+      "title": {
+        "en": "Flow (L/min)",
+        "nl": "Stroom (L/min)",
+        "da": "Flow (L/min)",
+        "de": "Durchfluss (L/min)",
+        "es": "Flujo (L/min)",
+        "fr": "Débit (L/min)",
+        "it": "Flusso (L/min)",
+        "no": "Strøm (L/min)",
+        "sv": "Flöde (L/min)",
+        "pl": "Przepływ (L/min)",
+        "ru": "Поток (л/мин)",
+        "ko": "유량 (L/분)"
+      }
+    }
+  ]
+}

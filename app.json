@@ -2,10 +2,32 @@
   "_comment": "This file is generated. Please edit .homeycompose/app.json instead.",
   "id": "com.wifipool",
   "name": {
-    "en": "Benifero WiFi Pool"
+    "en": "Benifero WiFi Pool",
+    "nl": "Benifero WiFi Zwembad",
+    "da": "Benifero WiFi Pool",
+    "de": "Benifero WiFi Pool",
+    "es": "Benifero Piscina WiFi",
+    "fr": "Benifero Piscine WiFi",
+    "it": "Benifero Piscina WiFi",
+    "no": "Benifero WiFi Basseng",
+    "sv": "Benifero WiFi Pool",
+    "pl": "Benifero Basen WiFi",
+    "ru": "Benifero WiFi Бассейн",
+    "ko": "베니페로 WiFi 풀"
   },
   "description": {
-    "en": "Benifero WiFi Pool integration for Homey."
+    "en": "Benifero WiFi Pool integration for Homey.",
+    "nl": "Benifero WiFi Zwembadintegratie voor Homey.",
+    "da": "Benifero WiFi Pool integration for Homey.",
+    "de": "Benifero WiFi Pool-Integration für Homey.",
+    "es": "Integración de Benifero Piscina WiFi para Homey.",
+    "fr": "Intégration de Benifero Piscine WiFi pour Homey.",
+    "it": "Integrazione di Benifero Piscina WiFi per Homey.",
+    "no": "Benifero WiFi Basseng integrasjon for Homey.",
+    "sv": "Benifero WiFi Pool-integration för Homey.",
+    "pl": "Integracja Basenu WiFi Benifero z Homey.",
+    "ru": "Интеграция Benifero WiFi Бассейн для Homey.",
+    "ko": "Homey를 위한 베니페로 WiFi 풀 통합입니다."
   },
   "category": [
     "tools"
@@ -25,6 +47,94 @@
       "ph",
       "flow",
       "hottub",
+      "wifipool"
+    ],
+    "nl": [
+      "zwembad",
+      "redhox",
+      "ph",
+      "stroom",
+      "hottub",
+      "wifipool"
+    ],
+    "da": [
+      "pool",
+      "redhox",
+      "ph",
+      "flow",
+      "hottub",
+      "wifipool"
+    ],
+    "de": [
+      "pool",
+      "redhox",
+      "ph",
+      "fluss",
+      "hottub",
+      "wifipool"
+    ],
+    "es": [
+      "piscina",
+      "redhox",
+      "ph",
+      "flujo",
+      "jacuzzi",
+      "wifipool"
+    ],
+    "fr": [
+      "piscine",
+      "redhox",
+      "ph",
+      "flux",
+      "jacuzzi",
+      "wifipool"
+    ],
+    "it": [
+      "piscina",
+      "redhox",
+      "ph",
+      "flusso",
+      "vasca calda",
+      "wifipool"
+    ],
+    "no": [
+      "basseng",
+      "redhox",
+      "ph",
+      "flyt",
+      "hottub",
+      "wifipool"
+    ],
+    "sv": [
+      "pool",
+      "redhox",
+      "pH",
+      "flöde",
+      "badkar",
+      "wifipool"
+    ],
+    "pl": [
+      "basen",
+      "redhox",
+      "ph",
+      "przepływ",
+      "jacuzzi",
+      "wifipool"
+    ],
+    "ru": [
+      "бассейн",
+      "redhox",
+      "pH",
+      "поток",
+      "гидромассажная ванна",
+      "wifipool"
+    ],
+    "ko": [
+      "풀",
+      "redhox",
+      "ph",
+      "흐름",
+      "온수 욕조",
       "wifipool"
     ]
   },
@@ -50,49 +160,22 @@
   },
   "esm": true,
   "flow": {
-    "actions": [
-      {
-        "id": "set_poll_interval",
-        "title": {
-          "en": "Set polling interval (seconds)",
-          "nl": "Stel polling-interval in (seconden)",
-          "da": "Indstil polling-interval (sekunder)",
-          "de": "Abfrageintervall einstellen (Sekunden)",
-          "es": "Establecer intervalo de sondeo (segundos)",
-          "fr": "Définir l'intervalle de sondage (secondes)",
-          "it": "Imposta l'intervallo di polling (secondi)",
-          "no": "Sett polling-intervall (sekunder)",
-          "sv": "Ställ in polling-intervall (sekunder)",
-          "pl": "Ustaw interwał sondowania (sekundy)",
-          "ru": "Установить интервал опроса (секунды)",
-          "ko": "폴링 간격 설정 (초)"
-        },
-        "args": [
-          {
-            "name": "seconds",
-            "type": "number"
-          }
-        ]
-      },
-      {
-        "id": "refresh_now",
-        "title": {
-          "en": "Refresh WiFi Pool now"
-        },
-        "args": [
-          {
-            "type": "device",
-            "name": "device",
-            "filter": "driver_id=wifipool"
-          }
-        ]
-      }
-    ],
     "triggers": [
       {
         "id": "flow_updated",
         "title": {
-          "en": "Flow status changed"
+          "en": "Flow status changed",
+          "nl": "Stroomstatus gewijzigd",
+          "da": "Flowstatus ændret",
+          "de": "Durchflussstatus geändert",
+          "es": "Estado de flujo cambiado",
+          "fr": "Statut de débit modifié",
+          "it": "Stato di flusso cambiato",
+          "no": "Strømstatus endret",
+          "sv": "Flödets status ändrad",
+          "pl": "Status przepływu został zmieniony",
+          "ru": "Статус потока изменен",
+          "ko": "흐름 상태 변경됨"
         },
         "args": [
           {
@@ -106,7 +189,18 @@
             "name": "flow",
             "type": "number",
             "title": {
-              "en": "Flow (L/min)"
+              "en": "Flow (L/min)",
+              "nl": "Stroom (L/min)",
+              "da": "Flow (L/min)",
+              "de": "Durchfluss (L/min)",
+              "es": "Flujo (L/min)",
+              "fr": "Débit (L/min)",
+              "it": "Flusso (L/min)",
+              "no": "Strøm (L/min)",
+              "sv": "Flöde (L/min)",
+              "pl": "Przepływ (L/min)",
+              "ru": "Поток (л/мин)",
+              "ko": "유량 (L/분)"
             }
           }
         ]
@@ -114,7 +208,18 @@
       {
         "id": "health_changed",
         "title": {
-          "en": "Connection Health status changed"
+          "en": "Connection Health status changed",
+          "nl": "Connectiegezondheidsstatus gewijzigd",
+          "da": "Forbindelseshelbredstatus ændret",
+          "de": "Verbindungsstatus geändert",
+          "es": "Estado de salud de conexión cambiado",
+          "fr": "État de santé de la connexion modifié",
+          "it": "Stato di salute della connessione cambiato",
+          "no": "Tilkoblingshelse-status endret",
+          "sv": "Anslutningshälsostatus ändrad",
+          "pl": "Status zdrowia połączenia zmieniony",
+          "ru": "Статус подключения изменен",
+          "ko": "연결 상태 변경됨"
         },
         "args": [
           {
@@ -128,40 +233,18 @@
             "name": "alarm",
             "type": "boolean",
             "title": {
-              "en": "Connection Health alarm"
-            }
-          }
-        ]
-      },
-      {
-        "id": "The ph_updated",
-        "title": {
-          "en": "pH changed"
-        },
-        "args": [
-          {
-            "type": "device",
-            "name": "device",
-            "filter": "driver_id=wifipool"
-          }
-        ],
-        "tokens": [
-          {
-            "name": "ph",
-            "type": "number",
-            "title": {
-              "en": "pH",
-              "nl": "pH",
-              "da": "pH",
-              "de": "pH",
-              "es": "pH",
-              "fr": "pH",
-              "it": "pH",
-              "no": "pH",
-              "sv": "pH",
-              "pl": "pH",
-              "ru": "pH",
-              "ko": "pH"
+              "en": "Connection Health alarm",
+              "nl": "Connectiegezondheidsalarm",
+              "da": "Forbindelseshelbreds alarm",
+              "de": "Verbindungsgesundheitsalarm",
+              "es": "Alarma de salud de conexión",
+              "fr": "Alarme de santé de la connexion",
+              "it": "Allarme salute connessione",
+              "no": "Tilkoblingshelses alarm",
+              "sv": "Anslutningshälsa-alarm",
+              "pl": "Alarm stanu zdrowia połączenia",
+              "ru": "Сигнал тревоги о состоянии соединения",
+              "ko": "연결 상태 알람"
             }
           }
         ]
@@ -169,7 +252,17 @@
       {
         "id": "redox_updated",
         "title": {
-          "en": "The Redox changed"
+          "en": "The Redox changed",
+          "da": "Redoxen ændrede sig",
+          "de": "Der Redox hat sich verändert",
+          "es": "El Redox cambió",
+          "fr": "Le Redox a changé",
+          "it": "Il Redox è cambiato",
+          "no": "Redoksen endret seg",
+          "sv": "Redoxen ändrades",
+          "pl": "Redoks się zmienił",
+          "ru": "Редокс изменился",
+          "ko": "산화 환원 전위가 변경되었습니다"
         },
         "args": [
           {
@@ -198,13 +291,68 @@
             }
           }
         ]
+      },
+      {
+        "id": "The ph_updated",
+        "title": {
+          "en": "pH changed",
+          "nl": "pH gewijzigd",
+          "da": "pH ændret",
+          "de": "pH geändert",
+          "es": "pH cambiado",
+          "fr": "pH changé",
+          "it": "pH modificato",
+          "no": "pH endret",
+          "sv": "pH ändrats",
+          "pl": "pH zmieniony",
+          "ru": "pH изменен",
+          "ko": "pH 변경됨"
+        },
+        "args": [
+          {
+            "type": "device",
+            "name": "device",
+            "filter": "driver_id=wifipool"
+          }
+        ],
+        "tokens": [
+          {
+            "name": "ph",
+            "type": "number",
+            "title": {
+              "en": "pH",
+              "nl": "pH",
+              "da": "pH",
+              "de": "pH",
+              "es": "pH",
+              "fr": "pH",
+              "it": "pH",
+              "no": "pH",
+              "sv": "pH",
+              "pl": "pH",
+              "ru": "pH",
+              "ko": "pH"
+            }
+          }
+        ]
       }
     ],
     "conditions": [
       {
         "id": "flow_above",
         "title": {
-          "en": "The Flow is above"
+          "en": "The Flow is above",
+          "nl": "De stroom is boven",
+          "da": "Flowet er over",
+          "de": "Der Fluss ist darüber",
+          "es": "El flujo está por encima",
+          "fr": "Le flux est au-dessus",
+          "it": "Il flusso è sopra",
+          "no": "Flyten er over",
+          "sv": "Flödet är ovanför",
+          "pl": "Przepływ jest powyżej",
+          "ru": "Поток выше",
+          "ko": "흐름이 위에 있습니다"
         },
         "args": [
           {
@@ -216,12 +364,37 @@
             "name": "threshold",
             "type": "number"
           }
-        ]
+        ],
+        "titleFormatted": {
+          "en": "Flow above [[threshold]]",
+          "nl": "Flow hoger dan [[threshold]]",
+          "da": "Flow over [[threshold]]",
+          "de": "Flow über [[threshold]]",
+          "es": "Flujo sobre [[threshold]]",
+          "fr": "Flux au-dessus de [[threshold]]",
+          "it": "Flusso sopra [[threshold]]",
+          "no": "Flyt over [[threshold]]",
+          "sv": "Flöde över [[threshold]]",
+          "pl": "Przepływ powyżej [[threshold]]",
+          "ru": "Поток выше [[threshold]]",
+          "ko": "[[threshold]] 이상 흐름"
+        }
       },
       {
         "id": "flow_below",
         "title": {
-          "en": "The Flow is below ..."
+          "en": "The Flow is below ...",
+          "nl": "De stroom is hieronder ...",
+          "da": "Flowet er nedenfor ...",
+          "de": "Der Fluss ist unten ...",
+          "es": "El flujo está abajo ...",
+          "fr": "Le flux est en dessous ...",
+          "it": "Il flusso è sotto ...",
+          "no": "Flyten er under ...",
+          "sv": "Flödet är nedanför ...",
+          "pl": "Przepływ jest poniżej ...",
+          "ru": "Поток ниже ...",
+          "ko": "흐름은 아래 ...입니다"
         },
         "args": [
           {
@@ -233,12 +406,36 @@
             "name": "threshold",
             "type": "number"
           }
-        ]
+        ],
+        "titleFormatted": {
+          "en": "Flow below [[threshold]]",
+          "nl": "Flow lager dan [[threshold]]",
+          "da": "Flow under [[threshold]]",
+          "de": "Fluss unter [[threshold]]",
+          "es": "Flujo por debajo de [[threshold]]",
+          "fr": "Flux inférieur à [[threshold]]",
+          "it": "Flusso sotto [[threshold]]",
+          "no": "Flyt under [[threshold]]",
+          "sv": "Flöde under [[threshold]]",
+          "pl": "Przepływ poniżej [[threshold]]",
+          "ru": "Поток ниже [[threshold]]",
+          "ko": "[[threshold]] 미만의 흐름"
+        }
       },
       {
         "id": "health_ok",
         "title": {
-          "en": "Connection Health"
+          "en": "Connection Health",
+          "da": "Forbindelse sundhed",
+          "de": "Verbindungszustand",
+          "es": "Salud de la conexión",
+          "fr": "Santé de la connexion",
+          "it": "Salute della connessione",
+          "no": "Tilkoblingshelse",
+          "sv": "Anslutningshälsa",
+          "pl": "Stan połączenia",
+          "ru": "Состояние соединения",
+          "ko": "연결 상태"
         },
         "args": [
           {
@@ -246,12 +443,37 @@
             "name": "device",
             "filter": "driver_id=wifipool"
           }
-        ]
+        ],
+        "titleFormatted": {
+          "en": "Connection healthy",
+          "nl": "Verbinding gezond",
+          "da": "Forbindelsen er sund",
+          "de": "Verbindung gesund",
+          "es": "Conexión saludable",
+          "fr": "Connexion saine",
+          "it": "Connessione sana",
+          "no": "Tilkoblingen er sunn",
+          "sv": "Anslutningen är frisk",
+          "pl": "Połączenie jest zdrowe",
+          "ru": "Соединение в порядке",
+          "ko": "연결이 양호"
+        }
       },
       {
         "id": "ph_above",
         "title": {
-          "en": "The pH is above ..."
+          "en": "The pH is above ...",
+          "nl": "De pH is boven ...",
+          "da": "pH-værdien er over ...",
+          "de": "Der pH-Wert liegt über ...",
+          "es": "El pH está por encima de ...",
+          "fr": "Le pH est au-dessus de ...",
+          "it": "Il pH è sopra ...",
+          "no": "pH-verdien er over ...",
+          "sv": "pH-värdet är över ...",
+          "pl": "pH jest powyżej ...",
+          "ru": "pH выше ...",
+          "ko": "pH가 ... 이상입니다."
         },
         "args": [
           {
@@ -263,12 +485,37 @@
             "name": "threshold",
             "type": "number"
           }
-        ]
+        ],
+        "titleFormatted": {
+          "en": "pH above [[threshold]]",
+          "nl": "pH hoger dan [[threshold]]",
+          "da": "pH over [[threshold]]",
+          "de": "pH über [[threshold]]",
+          "es": "pH por encima de [[threshold]]",
+          "fr": "pH au-dessus de [[threshold]]",
+          "it": "pH sopra [[threshold]]",
+          "no": "pH over [[threshold]]",
+          "sv": "pH över [[threshold]]",
+          "pl": "pH powyżej [[threshold]]",
+          "ru": "pH выше [[threshold]]",
+          "ko": "pH가 [[threshold]] 이상"
+        }
       },
       {
         "id": "ph_below",
         "title": {
-          "en": "The pH is below ..."
+          "en": "The pH is below ...",
+          "nl": "De pH is lager dan ...",
+          "da": "pH-værdien er under ...",
+          "de": "Der pH-Wert ist unter ...",
+          "es": "El pH está por debajo de ...",
+          "fr": "Le pH est en dessous de ...",
+          "it": "Il pH è inferiore a ...",
+          "no": "pH-verdien er under ...",
+          "sv": "pH är under ...",
+          "pl": "pH jest poniżej ...",
+          "ru": "pH ниже ...",
+          "ko": "pH가 이하입니다 ..."
         },
         "args": [
           {
@@ -280,12 +527,37 @@
             "name": "threshold",
             "type": "number"
           }
-        ]
+        ],
+        "titleFormatted": {
+          "en": "pH below [[threshold]]",
+          "nl": "pH lager dan [[threshold]]",
+          "da": "pH under [[threshold]]",
+          "de": "pH unter [[threshold]]",
+          "es": "pH por debajo de [[threshold]]",
+          "fr": "pH inférieur à [[threshold]]",
+          "it": "pH sotto [[threshold]]",
+          "no": "pH under [[threshold]]",
+          "sv": "pH under [[threshold]]",
+          "pl": "pH poniżej [[threshold]]",
+          "ru": "pH ниже [[threshold]]",
+          "ko": "pH가 [[threshold]] 이하"
+        }
       },
       {
         "id": "redox_above",
         "title": {
-          "en": "The Redox is above ..."
+          "en": "The Redox is above ...",
+          "nl": "De Redox is boven ...",
+          "da": "Redox er over ...",
+          "de": "Der Redox ist über ...",
+          "es": "El Redox está por encima de ...",
+          "fr": "Le Redox est au-dessus de ...",
+          "it": "Il Redox è sopra ...",
+          "no": "Redox er over ...",
+          "sv": "Redox är över ...",
+          "pl": "Redoks jest powyżej ...",
+          "ru": "Редокс выше ...",
+          "ko": "레독스가 위에 있습니다 ..."
         },
         "args": [
           {
@@ -297,12 +569,37 @@
             "name": "threshold",
             "type": "number"
           }
-        ]
+        ],
+        "titleFormatted": {
+          "en": "Redox above [[threshold]]",
+          "nl": "Redox hoger dan [[threshold]]",
+          "da": "Redox over [[threshold]]",
+          "de": "Redox über [[threshold]]",
+          "es": "Redox por encima de [[threshold]]",
+          "fr": "Redox au-dessus de [[threshold]]",
+          "it": "Redox sopra [[threshold]]",
+          "no": "Redox over [[threshold]]",
+          "sv": "Redox över [[threshold]]",
+          "pl": "Redoks powyżej [[threshold]]",
+          "ru": "Редокс выше [[threshold]]",
+          "ko": "레독스가 [[threshold]] 이상입니다"
+        }
       },
       {
         "id": "redox_below",
         "title": {
-          "en": "The Redox is below ..."
+          "en": "The Redox is below ...",
+          "nl": "De Redox is onder ...",
+          "da": "Redox er under ...",
+          "de": "Der Redox ist unter ...",
+          "es": "El Redox está por debajo ...",
+          "fr": "Le Redox est en dessous ...",
+          "it": "Il Redox è sotto ...",
+          "no": "Redox er under ...",
+          "sv": "Redox är under ...",
+          "pl": "Redoks jest poniżej ...",
+          "ru": "Редокс ниже ...",
+          "ko": "레독스가 아래로 ..."
         },
         "args": [
           {
@@ -314,7 +611,98 @@
             "name": "threshold",
             "type": "number"
           }
-        ]
+        ],
+        "titleFormatted": {
+          "en": "Redox below [[threshold]]",
+          "nl": "Redox lager dan [[threshold]]",
+          "da": "Redox under [[threshold]]",
+          "de": "Redox unter [[threshold]]",
+          "es": "Redox por debajo de [[threshold]]",
+          "fr": "Redox en dessous de [[threshold]]",
+          "it": "Redox sotto [[threshold]]",
+          "no": "Redox under [[threshold]]",
+          "sv": "Redox under [[threshold]]",
+          "pl": "Redoks poniżej [[threshold]]",
+          "ru": "Редокс ниже [[threshold]]",
+          "ko": "레독스 [[threshold]] 아래로"
+        }
+      }
+    ],
+    "actions": [
+      {
+        "id": "refresh_now",
+        "title": {
+          "en": "Refresh WiFi Pool now",
+          "nl": "Ververs WiFi-poel nu",
+          "da": "Opdater WiFi-pool nu",
+          "de": "WLAN-Pool jetzt aktualisieren",
+          "es": "Actualizar grupo WiFi ahora",
+          "fr": "Actualiser le pool WiFi maintenant",
+          "it": "Aggiorna il pool WiFi ora",
+          "no": "Oppdater WiFi-bassenget nå",
+          "sv": "Uppdatera WiFi-pool nu",
+          "pl": "Odśwież pulę WiFi teraz",
+          "ru": "Обновить WiFi пул сейчас",
+          "ko": "지금 WiFi 풀 새로고침"
+        },
+        "args": [
+          {
+            "type": "device",
+            "name": "device",
+            "filter": "driver_id=wifipool"
+          }
+        ],
+        "titleFormatted": {
+          "en": "Refresh now",
+          "nl": "Nu verversen",
+          "da": "Opdater nu",
+          "de": "Jetzt aktualisieren",
+          "es": "Actualizar ahora",
+          "fr": "Actualiser maintenant",
+          "it": "Aggiorna ora",
+          "no": "Oppdater nå",
+          "sv": "Uppdatera nu",
+          "pl": "Odśwież teraz",
+          "ru": "Обновить сейчас",
+          "ko": "지금 새로고침"
+        }
+      },
+      {
+        "id": "set_poll_interval",
+        "title": {
+          "en": "Set polling interval (seconds)",
+          "nl": "Stel polling-interval in (seconden)",
+          "da": "Indstil polling-interval (sekunder)",
+          "de": "Abfrageintervall einstellen (Sekunden)",
+          "es": "Establecer intervalo de sondeo (segundos)",
+          "fr": "Définir l'intervalle de sondage (secondes)",
+          "it": "Imposta l'intervallo di polling (secondi)",
+          "no": "Sett polling-intervall (sekunder)",
+          "sv": "Ställ in polling-intervall (sekunder)",
+          "pl": "Ustaw interwał sondowania (sekundy)",
+          "ru": "Установить интервал опроса (секунды)",
+          "ko": "폴링 간격 설정 (초)"
+        },
+        "args": [
+          {
+            "name": "seconds",
+            "type": "number"
+          }
+        ],
+        "titleFormatted": {
+          "en": "Set polling interval to [[seconds]] s",
+          "nl": "Stel polling-interval in op [[seconds]] s",
+          "da": "Indstil polling-interval til [[seconds]] s",
+          "de": "Abfrageintervall auf [[seconds]] s einstellen",
+          "es": "Establecer intervalo de sondeo a [[seconds]] s",
+          "fr": "Définir l'intervalle de sondage sur [[seconds]] s",
+          "it": "Imposta l'intervallo di polling a [[seconds]] s",
+          "no": "Sett polling-intervall til [[seconds]] s",
+          "sv": "Ställ in polling-intervall till [[seconds]] s",
+          "pl": "Ustaw interwał sondowania na [[seconds]] s",
+          "ru": "Установить интервал опроса на [[seconds]] с",
+          "ko": "폴링 간격을 [[seconds]]초로 설정"
+        }
       }
     ]
   },

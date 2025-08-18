@@ -1,0 +1,42 @@
+{
+  "id": "ph_above",
+  "title": {
+    "en": "The pH is above ...",
+    "nl": "De pH is boven ...",
+    "da": "pH-værdien er over ...",
+    "de": "Der pH-Wert liegt über ...",
+    "es": "El pH está por encima de ...",
+    "fr": "Le pH est au-dessus de ...",
+    "it": "Il pH è sopra ...",
+    "no": "pH-verdien er over ...",
+    "sv": "pH-värdet är över ...",
+    "pl": "pH jest powyżej ...",
+    "ru": "pH выше ...",
+    "ko": "pH가 ... 이상입니다."
+  },
+  "args": [
+    {
+      "type": "device",
+      "name": "device",
+      "filter": "driver_id=wifipool"
+    },
+    {
+      "name": "threshold",
+      "type": "number"
+    }
+  ],
+  "titleFormatted": {
+    "en": "pH above [[threshold]]",
+    "nl": "pH hoger dan [[threshold]]",
+    "da": "pH over [[threshold]]",
+    "de": "pH über [[threshold]]",
+    "es": "pH por encima de [[threshold]]",
+    "fr": "pH au-dessus de [[threshold]]",
+    "it": "pH sopra [[threshold]]",
+    "no": "pH over [[threshold]]",
+    "sv": "pH över [[threshold]]",
+    "pl": "pH powyżej [[threshold]]",
+    "ru": "pH выше [[threshold]]",
+    "ko": "pH가 [[threshold]] 이상"
+  }
+}

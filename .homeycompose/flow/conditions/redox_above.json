@@ -1,0 +1,42 @@
+{
+  "id": "redox_above",
+  "title": {
+    "en": "The Redox is above ...",
+    "nl": "De Redox is boven ...",
+    "da": "Redox er over ...",
+    "de": "Der Redox ist über ...",
+    "es": "El Redox está por encima de ...",
+    "fr": "Le Redox est au-dessus de ...",
+    "it": "Il Redox è sopra ...",
+    "no": "Redox er over ...",
+    "sv": "Redox är över ...",
+    "pl": "Redoks jest powyżej ...",
+    "ru": "Редокс выше ...",
+    "ko": "레독스가 위에 있습니다 ..."
+  },
+  "args": [
+    {
+      "type": "device",
+      "name": "device",
+      "filter": "driver_id=wifipool"
+    },
+    {
+      "name": "threshold",
+      "type": "number"
+    }
+  ],
+  "titleFormatted": {
+    "en": "Redox above [[threshold]]",
+    "nl": "Redox hoger dan [[threshold]]",
+    "da": "Redox over [[threshold]]",
+    "de": "Redox über [[threshold]]",
+    "es": "Redox por encima de [[threshold]]",
+    "fr": "Redox au-dessus de [[threshold]]",
+    "it": "Redox sopra [[threshold]]",
+    "no": "Redox over [[threshold]]",
+    "sv": "Redox över [[threshold]]",
+    "pl": "Redoks powyżej [[threshold]]",
+    "ru": "Редокс выше [[threshold]]",
+    "ko": "레독스가 [[threshold]] 이상입니다"
+  }
+}

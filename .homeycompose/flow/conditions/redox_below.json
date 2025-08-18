@@ -1,0 +1,42 @@
+{
+  "id": "redox_below",
+  "title": {
+    "en": "The Redox is below ...",
+    "nl": "De Redox is onder ...",
+    "da": "Redox er under ...",
+    "de": "Der Redox ist unter ...",
+    "es": "El Redox está por debajo ...",
+    "fr": "Le Redox est en dessous ...",
+    "it": "Il Redox è sotto ...",
+    "no": "Redox er under ...",
+    "sv": "Redox är under ...",
+    "pl": "Redoks jest poniżej ...",
+    "ru": "Редокс ниже ...",
+    "ko": "레독스가 아래로 ..."
+  },
+  "args": [
+    {
+      "type": "device",
+      "name": "device",
+      "filter": "driver_id=wifipool"
+    },
+    {
+      "name": "threshold",
+      "type": "number"
+    }
+  ],
+  "titleFormatted": {
+    "en": "Redox below [[threshold]]",
+    "nl": "Redox lager dan [[threshold]]",
+    "da": "Redox under [[threshold]]",
+    "de": "Redox unter [[threshold]]",
+    "es": "Redox por debajo de [[threshold]]",
+    "fr": "Redox en dessous de [[threshold]]",
+    "it": "Redox sotto [[threshold]]",
+    "no": "Redox under [[threshold]]",
+    "sv": "Redox under [[threshold]]",
+    "pl": "Redoks poniżej [[threshold]]",
+    "ru": "Редокс ниже [[threshold]]",
+    "ko": "레독스 [[threshold]] 아래로"
+  }
+}

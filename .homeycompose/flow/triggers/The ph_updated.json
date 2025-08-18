@@ -1,0 +1,44 @@
+{
+  "id": "The ph_updated",
+  "title": {
+    "en": "pH changed",
+    "nl": "pH gewijzigd",
+    "da": "pH ændret",
+    "de": "pH geändert",
+    "es": "pH cambiado",
+    "fr": "pH changé",
+    "it": "pH modificato",
+    "no": "pH endret",
+    "sv": "pH ändrats",
+    "pl": "pH zmieniony",
+    "ru": "pH изменен",
+    "ko": "pH 변경됨"
+  },
+  "args": [
+    {
+      "type": "device",
+      "name": "device",
+      "filter": "driver_id=wifipool"
+    }
+  ],
+  "tokens": [
+    {
+      "name": "ph",
+      "type": "number",
+      "title": {
+        "en": "pH",
+        "nl": "pH",
+        "da": "pH",
+        "de": "pH",
+        "es": "pH",
+        "fr": "pH",
+        "it": "pH",
+        "no": "pH",
+        "sv": "pH",
+        "pl": "pH",
+        "ru": "pH",
+        "ko": "pH"
+      }
+    }
+  ]
+}

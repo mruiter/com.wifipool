@@ -1,0 +1,43 @@
+{
+  "id": "redox_updated",
+  "title": {
+    "en": "The Redox changed",
+    "da": "Redoxen ændrede sig",
+    "de": "Der Redox hat sich verändert",
+    "es": "El Redox cambió",
+    "fr": "Le Redox a changé",
+    "it": "Il Redox è cambiato",
+    "no": "Redoksen endret seg",
+    "sv": "Redoxen ändrades",
+    "pl": "Redoks się zmienił",
+    "ru": "Редокс изменился",
+    "ko": "산화 환원 전위가 변경되었습니다"
+  },
+  "args": [
+    {
+      "type": "device",
+      "name": "device",
+      "filter": "driver_id=wifipool"
+    }
+  ],
+  "tokens": [
+    {
+      "name": "redox",
+      "type": "number",
+      "title": {
+        "en": "Redox (mV)",
+        "nl": "Redox (mV)",
+        "da": "Redox (mV)",
+        "de": "Redox (mV)",
+        "es": "Redox (mV)",
+        "fr": "Redox (mV)",
+        "it": "Redox (mV)",
+        "no": "Redoks (mV)",
+        "sv": "Redox (mV)",
+        "pl": "Redoks (mV)",
+        "ru": "Редокс (мВ)",
+        "ko": "산화 환원 전위 (mV)"
+      }
+    }
+  ]
+}

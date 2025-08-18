@@ -1,0 +1,42 @@
+{
+  "id": "ph_below",
+  "title": {
+    "en": "The pH is below ...",
+    "nl": "De pH is lager dan ...",
+    "da": "pH-værdien er under ...",
+    "de": "Der pH-Wert ist unter ...",
+    "es": "El pH está por debajo de ...",
+    "fr": "Le pH est en dessous de ...",
+    "it": "Il pH è inferiore a ...",
+    "no": "pH-verdien er under ...",
+    "sv": "pH är under ...",
+    "pl": "pH jest poniżej ...",
+    "ru": "pH ниже ...",
+    "ko": "pH가 이하입니다 ..."
+  },
+  "args": [
+    {
+      "type": "device",
+      "name": "device",
+      "filter": "driver_id=wifipool"
+    },
+    {
+      "name": "threshold",
+      "type": "number"
+    }
+  ],
+  "titleFormatted": {
+    "en": "pH below [[threshold]]",
+    "nl": "pH lager dan [[threshold]]",
+    "da": "pH under [[threshold]]",
+    "de": "pH unter [[threshold]]",
+    "es": "pH por debajo de [[threshold]]",
+    "fr": "pH inférieur à [[threshold]]",
+    "it": "pH sotto [[threshold]]",
+    "no": "pH under [[threshold]]",
+    "sv": "pH under [[threshold]]",
+    "pl": "pH poniżej [[threshold]]",
+    "ru": "pH ниже [[threshold]]",
+    "ko": "pH가 [[threshold]] 이하"
+  }
+}

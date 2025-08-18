@@ -1,0 +1,42 @@
+{
+  "id": "flow_above",
+  "title": {
+    "en": "The Flow is above",
+    "nl": "De stroom is boven",
+    "da": "Flowet er over",
+    "de": "Der Fluss ist darüber",
+    "es": "El flujo está por encima",
+    "fr": "Le flux est au-dessus",
+    "it": "Il flusso è sopra",
+    "no": "Flyten er over",
+    "sv": "Flödet är ovanför",
+    "pl": "Przepływ jest powyżej",
+    "ru": "Поток выше",
+    "ko": "흐름이 위에 있습니다"
+  },
+  "args": [
+    {
+      "type": "device",
+      "name": "device",
+      "filter": "driver_id=wifipool"
+    },
+    {
+      "name": "threshold",
+      "type": "number"
+    }
+  ],
+  "titleFormatted": {
+    "en": "Flow above [[threshold]]",
+    "nl": "Flow hoger dan [[threshold]]",
+    "da": "Flow over [[threshold]]",
+    "de": "Flow über [[threshold]]",
+    "es": "Flujo sobre [[threshold]]",
+    "fr": "Flux au-dessus de [[threshold]]",
+    "it": "Flusso sopra [[threshold]]",
+    "no": "Flyt over [[threshold]]",
+    "sv": "Flöde över [[threshold]]",
+    "pl": "Przepływ powyżej [[threshold]]",
+    "ru": "Поток выше [[threshold]]",
+    "ko": "[[threshold]] 이상 흐름"
+  }
+}

@@ -1,0 +1,38 @@
+{
+  "id": "refresh_now",
+  "title": {
+    "en": "Refresh WiFi Pool now",
+    "nl": "Ververs WiFi-poel nu",
+    "da": "Opdater WiFi-pool nu",
+    "de": "WLAN-Pool jetzt aktualisieren",
+    "es": "Actualizar grupo WiFi ahora",
+    "fr": "Actualiser le pool WiFi maintenant",
+    "it": "Aggiorna il pool WiFi ora",
+    "no": "Oppdater WiFi-bassenget nå",
+    "sv": "Uppdatera WiFi-pool nu",
+    "pl": "Odśwież pulę WiFi teraz",
+    "ru": "Обновить WiFi пул сейчас",
+    "ko": "지금 WiFi 풀 새로고침"
+  },
+  "args": [
+    {
+      "type": "device",
+      "name": "device",
+      "filter": "driver_id=wifipool"
+    }
+  ],
+  "titleFormatted": {
+    "en": "Refresh now",
+    "nl": "Nu verversen",
+    "da": "Opdater nu",
+    "de": "Jetzt aktualisieren",
+    "es": "Actualizar ahora",
+    "fr": "Actualiser maintenant",
+    "it": "Aggiorna ora",
+    "no": "Oppdater nå",
+    "sv": "Uppdatera nu",
+    "pl": "Odśwież teraz",
+    "ru": "Обновить сейчас",
+    "ko": "지금 새로고침"
+  }
+}

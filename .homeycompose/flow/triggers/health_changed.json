@@ -1,0 +1,44 @@
+{
+  "id": "health_changed",
+  "title": {
+    "en": "Connection Health status changed",
+    "nl": "Connectiegezondheidsstatus gewijzigd",
+    "da": "Forbindelseshelbredstatus ændret",
+    "de": "Verbindungsstatus geändert",
+    "es": "Estado de salud de conexión cambiado",
+    "fr": "État de santé de la connexion modifié",
+    "it": "Stato di salute della connessione cambiato",
+    "no": "Tilkoblingshelse-status endret",
+    "sv": "Anslutningshälsostatus ändrad",
+    "pl": "Status zdrowia połączenia zmieniony",
+    "ru": "Статус подключения изменен",
+    "ko": "연결 상태 변경됨"
+  },
+  "args": [
+    {
+      "type": "device",
+      "name": "device",
+      "filter": "driver_id=wifipool"
+    }
+  ],
+  "tokens": [
+    {
+      "name": "alarm",
+      "type": "boolean",
+      "title": {
+        "en": "Connection Health alarm",
+        "nl": "Connectiegezondheidsalarm",
+        "da": "Forbindelseshelbreds alarm",
+        "de": "Verbindungsgesundheitsalarm",
+        "es": "Alarma de salud de conexión",
+        "fr": "Alarme de santé de la connexion",
+        "it": "Allarme salute connessione",
+        "no": "Tilkoblingshelses alarm",
+        "sv": "Anslutningshälsa-alarm",
+        "pl": "Alarm stanu zdrowia połączenia",
+        "ru": "Сигнал тревоги о состоянии соединения",
+        "ko": "연결 상태 알람"
+      }
+    }
+  ]
+}

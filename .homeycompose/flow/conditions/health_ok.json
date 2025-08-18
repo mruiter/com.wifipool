@@ -1,0 +1,37 @@
+{
+  "id": "health_ok",
+  "title": {
+    "en": "Connection Health",
+    "da": "Forbindelse sundhed",
+    "de": "Verbindungszustand",
+    "es": "Salud de la conexión",
+    "fr": "Santé de la connexion",
+    "it": "Salute della connessione",
+    "no": "Tilkoblingshelse",
+    "sv": "Anslutningshälsa",
+    "pl": "Stan połączenia",
+    "ru": "Состояние соединения",
+    "ko": "연결 상태"
+  },
+  "args": [
+    {
+      "type": "device",
+      "name": "device",
+      "filter": "driver_id=wifipool"
+    }
+  ],
+  "titleFormatted": {
+    "en": "Connection healthy",
+    "nl": "Verbinding gezond",
+    "da": "Forbindelsen er sund",
+    "de": "Verbindung gesund",
+    "es": "Conexión saludable",
+    "fr": "Connexion saine",
+    "it": "Connessione sana",
+    "no": "Tilkoblingen er sunn",
+    "sv": "Anslutningen är frisk",
+    "pl": "Połączenie jest zdrowe",
+    "ru": "Соединение в порядке",
+    "ko": "연결이 양호"
+  }
+}
