@@ -11,7 +11,8 @@
     "sv": "Anslutningshälsa",
     "pl": "Stan połączenia",
     "ru": "Состояние соединения",
-    "ko": "연결 상태"
+    "ko": "연결 상태",
+    "nl": "Verbindingsgezondheid"
   },
   "args": [
     {

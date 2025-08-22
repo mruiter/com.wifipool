@@ -1,14 +1,9 @@
-Beniferro WiFi Basen
+Dodaje obsługę Beniferro WifiPool do monitorowania Redox, pH, temperatury i przepływu.
 
-Kontrola Basenów WiFi od Beniferro
+Strona ustawień aplikacji: Służy jedynie do testowania/logowania, znajdowania domeny urządzenia i połączonych modułów. 
+Podczas dodawania urządzenia zostaną wprowadzone dane logowania, a odkrywanie urządzenia zostanie przeprowadzone.
+Urządzenie: jeden "Czujnik Basenowy WiFi" ujawnia możliwości `measure_redox`, `measure_ph`, `measure_temperature`, `alarm_flow`.
+Logi: obszerne logi drukowane podczas uruchamiania `homey app run`.
 
-Dodaj wsparcie dla monitorowania Redoxu, pH, temperatury i przepływu
-
-Strona Ustawień Aplikacji: Służy tylko do testowania/zapisywania logowania, znajdywania domeny urządzenia i podłączonych modułów. 
-Podczas dodawania urządzenia dane do logowania i odkrycie zostaną wykonane dla urządzenia.
-Urządzenie: jeden "Czujnik WiFi Basen" udostępnia zdolności `measure_redox`, `measure_ph`, `measure_temperature`, `alarm_flow`.
-Logowanie: obszerne logi drukowane są podczas uruchamiania `homey app run`.
-
-## Uwagi
-Punkty końcowe API są oparte na przechwytywaniu komunikacji, oficjalna dokumentacja nie jest dostępna
-Ważne: Jakakolwiek zmiana po stronie Beniferro nie jest komunikowana i może zepsuć funkcjonalność tej aplikacji
+Punkty końcowe API są oparte na przechwytywaniu komunikacji, oficjalna dokumentacja nie jest dostępna.
+Ważne: Każda zmiana po stronie Beniferro nie jest komunikowana i może spowodować, że funkcjonalność tej aplikacji przestanie działać.

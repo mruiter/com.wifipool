@@ -16,18 +16,18 @@
     "ko": "베니페로 WiFi 풀"
   },
   "description": {
-    "en": "Benifero WiFi Pool integration for Homey.",
-    "nl": "Benifero WiFi Zwembadintegratie voor Homey.",
-    "da": "Benifero WiFi Pool integration for Homey.",
-    "de": "Benifero WiFi Pool-Integration für Homey.",
-    "es": "Integración de Benifero Piscina WiFi para Homey.",
-    "fr": "Intégration de Benifero Piscine WiFi pour Homey.",
-    "it": "Integrazione di Benifero Piscina WiFi per Homey.",
-    "no": "Benifero WiFi Basseng integrasjon for Homey.",
-    "sv": "Benifero WiFi Pool-integration för Homey.",
-    "pl": "Integracja Basenu WiFi Benifero z Homey.",
-    "ru": "Интеграция Benifero WiFi Бассейн для Homey.",
-    "ko": "Homey를 위한 베니페로 WiFi 풀 통합입니다."
+    "en": "Your Ultimate Pool Monitoring Solution",
+    "nl": "Je ultieme zwembadmonitoroplossing",
+    "da": "Din ultimative poolovervågningsløsning",
+    "de": "Ihre ultimative Pool-Überwachungslösung",
+    "es": "Tu solución definitiva para el monitoreo de piscinas",
+    "fr": "Votre solution ultime de surveillance de piscine",
+    "it": "La tua soluzione definitiva per il monitoraggio della piscina",
+    "no": "Din ultimate bassengovervåkningsløsning",
+    "sv": "Din ultimata poolövervakningslösning",
+    "pl": "Twoje ostateczne rozwiązanie do monitorowania basenów",
+    "ru": "Ваше лучшее решение для мониторинга бассейна",
+    "ko": "궁극의 수영장 모니터링 솔루션"
   },
   "category": [
     "tools"

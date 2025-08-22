@@ -1,10 +1,8 @@
-Beniferro WiFi Pool
+Fügt Unterstützung für Beniferro WifiPool hinzu, um dein Redox, pH, Temperatur und Fluss zu überwachen.
 
-WiFi-Poolsteuerung von Beniferro
+App-Einstellungsseite: Nur zum Testen/Protokollieren der Anmeldung, um die Gerätdomäne und verbundenen Module zu finden. Beim Hinzufügen eines Geräts werden die Anmeldedaten und die Entdeckung für das Gerät durchgeführt.
+Gerät: Ein "WiFi Pool Sensor" zeigt die Funktionen `measure_redox`, `measure_ph`, `measure_temperature`, `alarm_flow`.
+Protokollierung: Ausführliche Protokolle werden gedruckt, wenn `homey app run` ausgeführt wird.
 
-Unterstützung hinzufügen für die Überwachung von Redox, pH-Wert, Temperatur und Durchfluss
-
-App-Einstellungsseite: Nur um die Anmeldung zu testen/protokollieren, die Geräte-Domain und verbundene Module zu finden. Beim Hinzufügen des Geräts werden die Anmeldedaten und die Erkennung für das Gerät vorgenommen. Gerät: Ein "WiFi-Pool-Sensor" bietet die Funktionen `measure_redox`, `measure_ph`, `measure_temperature`, `alarm_flow`. Protokollierung: Umfangreiche Protokolle werden gedruckt, wenn `homey app run` ausgeführt wird.
-
-## Hinweise
-API-Endpunkte basieren auf der Erfassung der Kommunikation, offizielle Dokumentation ist nicht verfügbar. Wichtig: Jede Änderung seitens Beniferro wird nicht mitgeteilt und könnte die Funktionalität dieser App beeinträchtigen.
+API-Endpunkte basieren auf der Erfassung der Kommunikation, offizielle Dokumentation ist nicht verfügbar.
+Wichtig: Jede Änderung auf der Seite von Beniferro wird nicht kommuniziert und könnte die Funktionalität dieser App beeinträchtigen.
