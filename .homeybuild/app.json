@@ -30,7 +30,9 @@
     "ko": "궁극의 수영장 모니터링 솔루션"
   },
   "category": [
-    "tools"
+    "tools",
+    "appliances",
+    "climate"
   ],
   "compatibility": ">=12.0.1",
   "sdk": 3,
@@ -39,6 +41,13 @@
   "author": {
     "name": "Marco Ruiter",
     "email": "mruiter@eslaan24.nl"
+  },
+  "contributing": {
+    "donate": {
+      "paypal": {
+        "username": "MarcoRuiter"
+      }
+    }
   },
   "tags": {
     "en": [
@@ -143,7 +152,9 @@
     "large": "/assets/images/large.png",
     "small": "/assets/images/small.png"
   },
-  "permissions": [],
+  "permissions": [
+    "homey:manager:api"
+  ],
   "api": {
     "autoSetup": {
       "method": "POST",
@@ -250,6 +261,50 @@
         ]
       },
       {
+        "id": "ph_updated",
+        "title": {
+          "en": "pH changed",
+          "nl": "pH gewijzigd",
+          "da": "pH ændret",
+          "de": "pH geändert",
+          "es": "pH cambiado",
+          "fr": "pH changé",
+          "it": "pH modificato",
+          "no": "pH endret",
+          "sv": "pH ändrats",
+          "pl": "pH zmieniony",
+          "ru": "pH изменен",
+          "ko": "pH 변경됨"
+        },
+        "args": [
+          {
+            "type": "device",
+            "name": "device",
+            "filter": "driver_id=wifipool"
+          }
+        ],
+        "tokens": [
+          {
+            "name": "ph",
+            "type": "number",
+            "title": {
+              "en": "pH",
+              "nl": "pH",
+              "da": "pH",
+              "de": "pH",
+              "es": "pH",
+              "fr": "pH",
+              "it": "pH",
+              "no": "pH",
+              "sv": "pH",
+              "pl": "pH",
+              "ru": "pH",
+              "ko": "pH"
+            }
+          }
+        ]
+      },
+      {
         "id": "redox_updated",
         "title": {
           "en": "The Redox changed",
@@ -294,20 +349,20 @@
         ]
       },
       {
-        "id": "The ph_updated",
+        "id": "temp_updated",
         "title": {
-          "en": "pH changed",
-          "nl": "pH gewijzigd",
-          "da": "pH ændret",
-          "de": "pH geändert",
-          "es": "pH cambiado",
-          "fr": "pH changé",
-          "it": "pH modificato",
-          "no": "pH endret",
-          "sv": "pH ändrats",
-          "pl": "pH zmieniony",
-          "ru": "pH изменен",
-          "ko": "pH 변경됨"
+          "en": "Temperature changed",
+          "nl": "Temperatuur gewijzigd",
+          "da": "Temperaturen ændret",
+          "de": "Temperatur geändert",
+          "es": "Temperatura cambiada",
+          "fr": "Température modifiée",
+          "it": "Temperatura cambiata",
+          "no": "Temperaturen endret",
+          "sv": "Temperaturen ändrades",
+          "pl": "Temperatura się zmieniła",
+          "ru": "Температура изменилась",
+          "ko": "온도가 변경됨"
         },
         "args": [
           {
@@ -318,21 +373,21 @@
         ],
         "tokens": [
           {
-            "name": "ph",
+            "name": "temperature",
             "type": "number",
             "title": {
-              "en": "pH",
-              "nl": "pH",
-              "da": "pH",
-              "de": "pH",
-              "es": "pH",
-              "fr": "pH",
-              "it": "pH",
-              "no": "pH",
-              "sv": "pH",
-              "pl": "pH",
-              "ru": "pH",
-              "ko": "pH"
+              "en": "Temperature (°C)",
+              "nl": "Temperatuur (°C)",
+              "da": "Temperatur (°C)",
+              "de": "Temperatur (°C)",
+              "es": "Temperatura (°C)",
+              "fr": "Température (°C)",
+              "it": "Temperatura (°C)",
+              "no": "Temperatur (°C)",
+              "sv": "Temperatur (°C)",
+              "pl": "Temperatura (°C)",
+              "ru": "Температура (°C)",
+              "ko": "온도 (°C)"
             }
           }
         ]
