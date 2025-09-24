@@ -30,12 +30,14 @@
     "ko": "궁극의 수영장 모니터링 솔루션"
   },
   "category": [
-    "tools" , "appliances", "climate"
+    "tools",
+    "appliances",
+    "climate"
   ],
   "compatibility": ">=12.0.1",
   "sdk": 3,
   "brandColor": "#0b5ea8",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "author": {
     "name": "Marco Ruiter",
     "email": "mruiter@eslaan24.nl"
@@ -150,7 +152,9 @@
     "large": "/assets/images/large.png",
     "small": "/assets/images/small.png"
   },
-  "permissions": ["homey:manager:api"],
+  "permissions": [
+    "homey:manager:api"
+  ],
   "api": {
     "autoSetup": {
       "method": "POST",

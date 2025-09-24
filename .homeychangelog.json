@@ -10,5 +10,8 @@
   },
   "1.0.3": {
     "en": "Corrected icon file on driver missing and appstore requirements"
+  },
+  "1.0.4": {
+    "en": "Corrected flow card temp changed and api"
   }
 }
