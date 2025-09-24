@@ -150,7 +150,7 @@
     "large": "/assets/images/large.png",
     "small": "/assets/images/small.png"
   },
-  "permissions": [],
+  "permissions": ["homey:manager:api"],
   "api": {
     "autoSetup": {
       "method": "POST",
