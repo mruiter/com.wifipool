@@ -30,7 +30,7 @@
     "ko": "궁극의 수영장 모니터링 솔루션"
   },
   "category": [
-    "tools"
+    "tools" , "appliances", "climate"
   ],
   "compatibility": ">=12.0.1",
   "sdk": 3,
@@ -39,6 +39,13 @@
   "author": {
     "name": "Marco Ruiter",
     "email": "mruiter@eslaan24.nl"
+  },
+  "contributing": {
+    "donate": {
+      "paypal": {
+        "username": "MarcoRuiter"
+      }
+    }
   },
   "tags": {
     "en": [
