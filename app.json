@@ -294,7 +294,51 @@
         ]
       },
       {
-        "id": "The ph_updated",
+        "id": "temp_updated",
+        "title": {
+          "en": "Temperature changed",
+          "nl": "Temperatuur gewijzigd",
+          "da": "Temperaturen ændret",
+          "de": "Temperatur geändert",
+          "es": "Temperatura cambiada",
+          "fr": "Température modifiée",
+          "it": "Temperatura cambiata",
+          "no": "Temperaturen endret",
+          "sv": "Temperaturen ändrades",
+          "pl": "Temperatura się zmieniła",
+          "ru": "Температура изменилась",
+          "ko": "온도가 변경됨"
+        },
+        "args": [
+          {
+            "type": "device",
+            "name": "device",
+            "filter": "driver_id=wifipool"
+          }
+        ],
+        "tokens": [
+          {
+            "name": "temperature",
+            "type": "number",
+            "title": {
+              "en": "Temperature (°C)",
+              "nl": "Temperatuur (°C)",
+              "da": "Temperatur (°C)",
+              "de": "Temperatur (°C)",
+              "es": "Temperatura (°C)",
+              "fr": "Température (°C)",
+              "it": "Temperatura (°C)",
+              "no": "Temperatur (°C)",
+              "sv": "Temperatur (°C)",
+              "pl": "Temperatura (°C)",
+              "ru": "Температура (°C)",
+              "ko": "온도 (°C)"
+            }
+          }
+        ]
+      },
+      {
+        "id": "ph_updated",
         "title": {
           "en": "pH changed",
           "nl": "pH gewijzigd",
