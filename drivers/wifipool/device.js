@@ -254,8 +254,18 @@ export default class WiFiPoolDevice extends Homey.Device {
 
   _isSwitchWritable(io) {
     if (!io) return false;
-    if (!this._switchWritableIo) return false;
-    return this._switchWritableIo[io] === true;
+
+    // First prefer explicit knowledge about IO writability gathered from
+    // previous API calls. When we have seen a successful `setManualIO` we mark
+    // the IO as writable, and when the API rejects the call we mark it as
+    // read-only.  However, on a fresh boot/pairing we might not have any
+    // information stored yet, so fall back to the IO naming convention: all
+    // outputs (`.oX`) are writable, inputs (`.iX`) are not.
+    if (this._switchWritableIo && io in this._switchWritableIo) {
+      return this._switchWritableIo[io] === true;
+    }
+
+    return /\.o\d+$/i.test(io);
   }
 
   // ----- Polling -----
