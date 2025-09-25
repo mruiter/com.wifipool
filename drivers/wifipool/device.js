@@ -243,13 +243,15 @@ export default class WiFiPoolDevice extends Homey.Device {
     const powerIo = pair?.power || (/\.i\d+$/i.test(io) ? io : null);
 
     const commands = [];
+    const isOutputIo = ioId => /\.o\d+$/i.test(ioId || '');
+
     if (bool) {
       if (manualIo) commands.push({ io: manualIo, target: true, options: {} });
-      if (powerIo && powerIo !== manualIo) {
+      if (powerIo && powerIo !== manualIo && isOutputIo(powerIo)) {
         commands.push({ io: powerIo, target: true, options: { skipWritableCheck: true, markWritable: false } });
       }
     } else {
-      if (powerIo) {
+      if (powerIo && isOutputIo(powerIo)) {
         commands.push({ io: powerIo, target: false, options: { skipWritableCheck: manualIo !== powerIo, markWritable: false } });
       }
       if (manualIo && manualIo !== powerIo) {
