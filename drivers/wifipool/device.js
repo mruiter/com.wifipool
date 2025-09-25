@@ -74,7 +74,7 @@ export default class WiFiPoolDevice extends Homey.Device {
       mapping[io] = capId;
       reverse[capId] = io;
       const prev = this._switchWritableIo?.[io];
-      writable[io] = prev == null ? (/\.i\d+$/i.test(io)) : !!prev;
+      writable[io] = prev == null ? (/\.o\d+$/i.test(io)) : !!prev;
     }
 
     this._switchCapabilityByIo = mapping;
