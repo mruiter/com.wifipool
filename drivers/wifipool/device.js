@@ -5,6 +5,10 @@ import fetch from 'node-fetch';
 const BASE = 'https://api.wifipool.eu/native_mobile';
 const STALE_MS = 5 * 60 * 1000;          // 5 minutes for pH/ORP/Temp
 const FLOW_ANALOG_THRESHOLD = 0.5;       // abs(analog) >= threshold => flow=true
+const KNOWN_SWITCH_CAPABILITIES = new Set([
+  'onoff_i0', 'onoff_i1', 'onoff_i2', 'onoff_i3',
+  'onoff_o0', 'onoff_o1', 'onoff_o2', 'onoff_o3'
+]);
 
 export default class WiFiPoolDevice extends Homey.Device {
   async onInit() {
@@ -24,15 +28,84 @@ export default class WiFiPoolDevice extends Homey.Device {
     // remember last published flow to avoid redundant writes
     this._lastFlowBool = this.getCapabilityValue('alarm_flow') ?? null;
 
+    this._switchCapabilityByIo = Object.create(null);
+    this._switchLastValues = Object.create(null);
+
+    await this._syncSwitchCapabilities();
+
     this._startPolling();
   }
 
-  async onAdded() { this._startPolling(); }
+  async onAdded() {
+    await this._syncSwitchCapabilities();
+    this._startPolling();
+  }
   async onDeleted() { this._stopPolling(); }
   async onSettings({ changedKeys }) {
     if (changedKeys.includes('poll_interval')) {
       this.log('[WiFiPool][Device] poll_interval changed → restart polling');
       await this._restartPolling();
+    }
+  }
+
+  async _syncSwitchCapabilities() {
+    const store = this.getStore() || {};
+    const io_map = store.io_map || {};
+    const switches = Array.isArray(io_map.switches) ? io_map.switches : [];
+
+    const desired = new Set();
+    const mapping = Object.create(null);
+
+    for (const io of switches) {
+      if (typeof io !== 'string') continue;
+      const match = io.match(/\.((?:i|o)\d+)$/i);
+      if (!match) continue;
+      const capId = `onoff_${match[1].toLowerCase()}`;
+      if (!KNOWN_SWITCH_CAPABILITIES.has(capId)) continue;
+      desired.add(capId);
+      mapping[io] = capId;
+    }
+
+    this._switchCapabilityByIo = mapping;
+
+    const existing = (this.getCapabilities() || []).filter(cap => /^onoff_[io]\d+$/i.test(cap));
+
+    for (const cap of existing) {
+      if (desired.has(cap)) continue;
+      try {
+        await this.removeCapability(cap);
+        delete this._switchLastValues[cap];
+        this.log('[WiFiPool][Device] removed switch capability', cap);
+      } catch (err) {
+        this.error(`[WiFiPool][Device] failed to remove capability ${cap}:`, err?.message || err);
+      }
+    }
+
+    for (const cap of desired) {
+      if (this.hasCapability(cap)) continue;
+      try {
+        await this.addCapability(cap);
+        this.log('[WiFiPool][Device] added switch capability', cap);
+      } catch (err) {
+        this.error(`[WiFiPool][Device] failed to add capability ${cap}:`, err?.message || err);
+      }
+    }
+  }
+
+  async _updateSwitchCapability(io, bool, meta = '') {
+    if (bool == null) return;
+    const cap = this._switchCapabilityByIo?.[io];
+    if (!cap || !this.hasCapability(cap)) return;
+
+    const value = !!bool;
+    if (this._switchLastValues[cap] === value) return;
+
+    this._switchLastValues[cap] = value;
+    try {
+      await this.setCapabilityValue(cap, value);
+      this.log('[WiFiPool][Device] switch updated →', cap, value, meta);
+    } catch (err) {
+      this.error(`[WiFiPool][Device] failed to set ${cap}:`, err?.message || err);
     }
   }
 
@@ -310,6 +383,8 @@ export default class WiFiPoolDevice extends Homey.Device {
       if (sample) this.log('[WiFiPool][Device] flow sample :=', JSON.stringify(sample));
     };
 
+    const results = [];
+
     const scan = async (list, label) => {
       for (const io of list) {
         // Force after=0 for switch/relay to always get latest toggle
@@ -322,21 +397,23 @@ export default class WiFiPoolDevice extends Homey.Device {
         const ts = Date.parse(sample?.device_sensor_time) || 0;
         const { bool, via } = this._decodeSwitchBool(sample);
         this.log(`[WiFiPool][Device] flow(${label}) io=${io} via=${via} bool=${bool} newest=${ts ? new Date(ts).toISOString() : 'n/a'}`);
-        if (bool !== null) return { bool, io, sample };
+        try {
+          await this._updateSwitchCapability(io, bool, `(via ${via}${ts ? ` @ ${new Date(ts).toISOString()}` : ''})`);
+        } catch (err) {
+          this.error('[WiFiPool][Device] update switch capability error:', err?.message || err);
+        }
+        if (bool !== null) {
+          results.push({ bool, io, sample });
+        }
       }
-      return null;
     };
 
-    // 1) Try outputs
-    if (outputs.length) {
-      const res = await scan(outputs, 'out');
-      if (res) return publish(res.bool, `(output ${res.io})`, res.sample);
-    }
+    if (outputs.length) await scan(outputs, 'out');
+    if (inputs.length) await scan(inputs, 'in');
 
-    // 2) Try inputs
-    if (inputs.length) {
-      const res = await scan(inputs, 'in');
-      if (res) return publish(res.bool, `(input ${res.io})`, res.sample);
+    if (results.length) {
+      const first = results[0];
+      return publish(first.bool, `(switch ${first.io})`, first.sample);
     }
 
     // 3) Fallback to analog if mapped
