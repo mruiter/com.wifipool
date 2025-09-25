@@ -35,6 +35,49 @@
     "large": "/drivers/wifipool/assets/images/large.jpg",
     "xlarge": "/drivers/wifipool/assets/images/xlarge.jpg"
   },
+  "mobile": {
+    "components": [
+      {
+        "id": "sensor",
+        "capabilities": [
+          "measure_temperature",
+          "measure_redox",
+          "measure_ph",
+          "alarm_flow",
+          "alarm_health"
+        ]
+      },
+      {
+        "id": "toggle",
+        "capabilities": [
+          "onoff_i0",
+          "onoff_i1",
+          "onoff_i2",
+          "onoff_i3",
+          "onoff_o0",
+          "onoff_o1",
+          "onoff_o2",
+          "onoff_o3"
+        ],
+        "options": {
+          "title": {
+            "en": "Detected switches",
+            "nl": "Gedetecteerde schakelaars",
+            "da": "Registrerede kontakter",
+            "de": "Erkannte Schalter",
+            "es": "Interruptores detectados",
+            "fr": "Interrupteurs détectés",
+            "it": "Interruttori rilevati",
+            "no": "Oppdagede brytere",
+            "sv": "Upptäckta brytare",
+            "pl": "Wykryte przełączniki",
+            "ru": "Обнаруженные переключатели",
+            "ko": "감지된 스위치"
+          }
+        }
+      }
+    ]
+  },
   "platforms": [
     "local",
     "cloud"
