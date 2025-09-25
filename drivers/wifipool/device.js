@@ -125,7 +125,10 @@ export default class WiFiPoolDevice extends Homey.Device {
     const desiredCaps = new Set(Object.keys(this._switchIoByCapability || {}));
 
     for (const [cap, handler] of Object.entries(this._switchListenerByCap)) {
-      if (desiredCaps.has(cap) && this.hasCapability(cap)) continue;
+      const io = this._switchIoByCapability?.[cap] || '';
+      const isOutput = /\.o\d+$/i.test(io);
+      const keepListener = desiredCaps.has(cap) && this.hasCapability(cap) && isOutput;
+      if (keepListener) continue;
 
       if (typeof this.unregisterCapabilityListener === 'function') {
         try {
@@ -139,6 +142,25 @@ export default class WiFiPoolDevice extends Homey.Device {
 
     for (const cap of desiredCaps) {
       if (!this.hasCapability(cap)) continue;
+
+      const io = this._switchIoByCapability?.[cap] || '';
+      const isOutput = /\.o\d+$/i.test(io);
+
+      try {
+        if (typeof this.setCapabilityOptions === 'function') {
+          const existing = typeof this.getCapabilityOptions === 'function'
+            ? this.getCapabilityOptions(cap) || {}
+            : {};
+          if (existing.setable !== isOutput) {
+            await this.setCapabilityOptions(cap, { ...existing, setable: isOutput });
+          }
+        }
+      } catch (err) {
+        this.error(`[WiFiPool][Device] failed to set capability options ${cap}:`, err?.message || err);
+      }
+
+      if (!isOutput) continue;
+
       if (this._switchListenerByCap[cap]) continue;
 
       const handler = this._handleSwitchCommand.bind(this, cap);
@@ -173,6 +195,11 @@ export default class WiFiPoolDevice extends Homey.Device {
       throw new Error('Switch not mapped');
     }
 
+    if (!/\.o\d+$/i.test(io)) {
+      this.error('[WiFiPool][Device] capability command for read-only sensor', cap, io);
+      throw new Error('Switch is read-only');
+    }
+
     const bool = !!value;
     await this._setManualIO(io, bool);
 
@@ -188,6 +215,10 @@ export default class WiFiPoolDevice extends Homey.Device {
     const store = this.getStore() || {};
     const domain = store.domain;
     if (!domain) throw new Error('Missing domain in device store');
+
+    if (!/\.o\d+$/i.test(io || '')) {
+      throw new Error('Cannot control sensor IO');
+    }
 
     const cookie = await this._ensureLogin();
     const body = { domain, io, value: bool ? 1 : 0 };
