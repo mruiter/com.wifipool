@@ -90,6 +90,20 @@ export default class WiFiPoolDevice extends Homey.Device {
 
     this._switchCapabilityByIo = mapping;
     this._switchIoByCapability = reverse;
+
+    for (const entry of Object.values(pairByKey)) {
+      if (!entry || !entry.manual || !entry.power) continue;
+
+      // When the API exposes both a manual relay (".oX") and the
+      // corresponding power sensor (".iX"), toggling either of them from the
+      // Homey UI should behave the same.  We already know that the manual
+      // output is writable, so mark the paired input as writable as well (so
+      // long as we have not explicitly learned that it is read-only).
+      if (writable[entry.manual] !== false && writable[entry.power] !== false) {
+        writable[entry.power] = true;
+      }
+    }
+
     this._switchWritableIo = writable;
     const pairByIo = Object.create(null);
     for (const entry of Object.values(pairByKey)) {
