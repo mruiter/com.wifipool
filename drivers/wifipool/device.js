@@ -126,8 +126,8 @@ export default class WiFiPoolDevice extends Homey.Device {
 
     for (const [cap, handler] of Object.entries(this._switchListenerByCap)) {
       const io = this._switchIoByCapability?.[cap] || '';
-      const isInput = /\.i\d+$/i.test(io);
-      const keepListener = desiredCaps.has(cap) && this.hasCapability(cap) && isInput;
+      const isWritable = /\.(?:i|o)\d+$/i.test(io);
+      const keepListener = desiredCaps.has(cap) && this.hasCapability(cap) && isWritable;
       if (keepListener) continue;
 
       if (typeof this.unregisterCapabilityListener === 'function') {
@@ -144,22 +144,22 @@ export default class WiFiPoolDevice extends Homey.Device {
       if (!this.hasCapability(cap)) continue;
 
       const io = this._switchIoByCapability?.[cap] || '';
-      const isInput = /\.i\d+$/i.test(io);
+      const isWritable = /\.(?:i|o)\d+$/i.test(io);
 
       try {
         if (typeof this.setCapabilityOptions === 'function') {
           const existing = typeof this.getCapabilityOptions === 'function'
             ? this.getCapabilityOptions(cap) || {}
             : {};
-          if (existing.setable !== isInput) {
-            await this.setCapabilityOptions(cap, { ...existing, setable: isInput });
+          if (existing.setable !== isWritable) {
+            await this.setCapabilityOptions(cap, { ...existing, setable: isWritable });
           }
         }
       } catch (err) {
         this.error(`[WiFiPool][Device] failed to set capability options ${cap}:`, err?.message || err);
       }
 
-      if (!isInput) continue;
+      if (!isWritable) continue;
 
       if (this._switchListenerByCap[cap]) continue;
 
@@ -195,7 +195,7 @@ export default class WiFiPoolDevice extends Homey.Device {
       throw new Error('Switch not mapped');
     }
 
-    if (!/\.i\d+$/i.test(io)) {
+    if (!/\.(?:i|o)\d+$/i.test(io)) {
       this.error('[WiFiPool][Device] capability command for read-only sensor', cap, io);
       throw new Error('Switch is read-only');
     }
@@ -216,7 +216,7 @@ export default class WiFiPoolDevice extends Homey.Device {
     const domain = store.domain;
     if (!domain) throw new Error('Missing domain in device store');
 
-    if (!/\.i\d+$/i.test(io || '')) {
+    if (!/\.(?:i|o)\d+$/i.test(io || '')) {
       throw new Error('Cannot control sensor IO');
     }
 
