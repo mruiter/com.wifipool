@@ -48,12 +48,33 @@
         ]
       },
       {
-        "id": "toggle",
+        "id": "switch-controls",
         "capabilities": [
           "onoff_i0",
           "onoff_i1",
           "onoff_i2",
-          "onoff_i3",
+          "onoff_i3"
+        ],
+        "options": {
+          "title": {
+            "en": "Switch controls",
+            "nl": "Switch controls",
+            "da": "Switch controls",
+            "de": "Switch controls",
+            "es": "Switch controls",
+            "fr": "Switch controls",
+            "it": "Switch controls",
+            "no": "Switch controls",
+            "sv": "Switch controls",
+            "pl": "Switch controls",
+            "ru": "Switch controls",
+            "ko": "Switch controls"
+          }
+        }
+      },
+      {
+        "id": "switch-status",
+        "capabilities": [
           "onoff_o0",
           "onoff_o1",
           "onoff_o2",
@@ -61,18 +82,18 @@
         ],
         "options": {
           "title": {
-            "en": "Detected switches",
-            "nl": "Gedetecteerde schakelaars",
-            "da": "Registrerede kontakter",
-            "de": "Erkannte Schalter",
-            "es": "Interruptores detectados",
-            "fr": "Interrupteurs détectés",
-            "it": "Interruttori rilevati",
-            "no": "Oppdagede brytere",
-            "sv": "Upptäckta brytare",
-            "pl": "Wykryte przełączniki",
-            "ru": "Обнаруженные переключатели",
-            "ko": "감지된 스위치"
+            "en": "Switch status",
+            "nl": "Switch status",
+            "da": "Switch status",
+            "de": "Switch status",
+            "es": "Switch status",
+            "fr": "Switch status",
+            "it": "Switch status",
+            "no": "Switch status",
+            "sv": "Switch status",
+            "pl": "Switch status",
+            "ru": "Switch status",
+            "ko": "Switch status"
           }
         }
       }
