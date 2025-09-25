@@ -1,0 +1,54 @@
+{
+  "id": "gl-s-005z",
+  "name": {
+    "en": "GL-S-005Z RGB/CCT MR16 Spot",
+    "nl": "GL-S-005Z RGB/CCT MR16 Spot",
+    "da": "GL-S-005Z RGB/CCT MR16 Spot",
+    "de": "GL-S-005Z RGB/CCT MR16 Spot",
+    "es": "GL-S-005Z RGB/CCT MR16 Spot",
+    "fr": "GL-S-005Z RGB/CCT MR16 Spot",
+    "it": "GL-S-005Z RGB/CCT MR16 Spot",
+    "no": "GL-S-005Z RGB/CCT MR16 Spot",
+    "sv": "GL-S-005Z RGB/CCT MR16 Spot",
+    "pl": "GL-S-005Z RGB/CCT MR16 Spot",
+    "ru": "GL-S-005Z RGB/CCT MR16 Spot",
+    "ko": "GL-S-005Z RGB/CCT MR16 Spot"
+  },
+  "class": "light",
+  "capabilities": [
+    "onoff",
+    "dim",
+    "light_hue",
+    "light_saturation",
+    "light_temperature",
+    "light_mode"
+  ],
+  "connectivity": [
+    "zigbee"
+  ],
+  "images": {
+    "small": "/drivers/gl-s-005z/assets/images/small.png",
+    "large": "/drivers/gl-s-005z/assets/images/large.png",
+    "xlarge": "/drivers/gl-s-005z/assets/images/xlarge.png"
+  },
+  "platforms": [
+    "local"
+  ],
+  "pair": [
+    {
+      "id": "start",
+      "instruction": {
+        "en": "Reset the device according to the manual and keep it close to Homey during pairing.",
+        "nl": "Reset het apparaat volgens de handleiding en houd het dicht bij Homey tijdens het koppelen."
+      }
+    }
+  ],
+  "zigbee": {
+    "manufacturerName": [
+      "GLEDOPTO"
+    ],
+    "zigbeeModels": [
+      "GL-S-005Z"
+    ]
+  }
+}

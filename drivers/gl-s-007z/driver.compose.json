@@ -1,0 +1,54 @@
+{
+  "id": "gl-s-007z",
+  "name": {
+    "en": "GL-S-007Z RGB/CCT GU10 Spot",
+    "nl": "GL-S-007Z RGB/CCT GU10 Spot",
+    "da": "GL-S-007Z RGB/CCT GU10 Spot",
+    "de": "GL-S-007Z RGB/CCT GU10 Spot",
+    "es": "GL-S-007Z RGB/CCT GU10 Spot",
+    "fr": "GL-S-007Z RGB/CCT GU10 Spot",
+    "it": "GL-S-007Z RGB/CCT GU10 Spot",
+    "no": "GL-S-007Z RGB/CCT GU10 Spot",
+    "sv": "GL-S-007Z RGB/CCT GU10 Spot",
+    "pl": "GL-S-007Z RGB/CCT GU10 Spot",
+    "ru": "GL-S-007Z RGB/CCT GU10 Spot",
+    "ko": "GL-S-007Z RGB/CCT GU10 Spot"
+  },
+  "class": "light",
+  "capabilities": [
+    "onoff",
+    "dim",
+    "light_hue",
+    "light_saturation",
+    "light_mode"
+  ],
+  "connectivity": [
+    "zigbee"
+  ],
+  "images": {
+    "small": "/drivers/gl-s-007z/assets/images/small.png",
+    "large": "/drivers/gl-s-007z/assets/images/large.png",
+    "xlarge": "/drivers/gl-s-007z/assets/images/xlarge.png"
+  },
+  "platforms": [
+    "local"
+  ],
+  "pair": [
+    {
+      "id": "start",
+      "instruction": {
+        "en": "Reset the device according to the manual and keep it close to Homey during pairing.",
+        "nl": "Reset het apparaat volgens de handleiding en houd het dicht bij Homey tijdens het koppelen."
+      }
+    }
+  ],
+  "zigbee": {
+    "manufacturerName": [
+      "GLEDOPTO"
+    ],
+    "zigbeeModels": [
+      "GL-S-007Z",
+      "GL-S-007Z(lk)"
+    ]
+  }
+}

@@ -1,0 +1,51 @@
+{
+  "id": "gl-c-006p",
+  "name": {
+    "en": "GL-C-006 WW+CW Controller",
+    "nl": "GL-C-006 WW+CW Controller",
+    "da": "GL-C-006 WW+CW Controller",
+    "de": "GL-C-006 WW+CW Controller",
+    "es": "GL-C-006 WW+CW Controller",
+    "fr": "GL-C-006 WW+CW Controller",
+    "it": "GL-C-006 WW+CW Controller",
+    "no": "GL-C-006 WW+CW Controller",
+    "sv": "GL-C-006 WW+CW Controller",
+    "pl": "GL-C-006 WW+CW Controller",
+    "ru": "GL-C-006 WW+CW Controller",
+    "ko": "GL-C-006 WW+CW Controller"
+  },
+  "class": "light",
+  "capabilities": [
+    "onoff",
+    "dim",
+    "light_temperature"
+  ],
+  "connectivity": [
+    "zigbee"
+  ],
+  "images": {
+    "small": "/drivers/gl-c-006p/assets/images/small.png",
+    "large": "/drivers/gl-c-006p/assets/images/large.png",
+    "xlarge": "/drivers/gl-c-006p/assets/images/xlarge.png"
+  },
+  "platforms": [
+    "local"
+  ],
+  "pair": [
+    {
+      "id": "start",
+      "instruction": {
+        "en": "Reset the device according to the manual and keep it close to Homey during pairing.",
+        "nl": "Reset het apparaat volgens de handleiding en houd het dicht bij Homey tijdens het koppelen."
+      }
+    }
+  ],
+  "zigbee": {
+    "manufacturerName": [
+      "GLEDOPTO"
+    ],
+    "zigbeeModels": [
+      "GL-C-006P"
+    ]
+  }
+}

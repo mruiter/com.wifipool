@@ -1,0 +1,54 @@
+{
+  "id": "gl-mc-001p",
+  "name": {
+    "en": "GL-MC-001P RGB+CCT Mini Controller",
+    "nl": "GL-MC-001P RGB+CCT Mini Controller",
+    "da": "GL-MC-001P RGB+CCT Mini Controller",
+    "de": "GL-MC-001P RGB+CCT Mini Controller",
+    "es": "GL-MC-001P RGB+CCT Mini Controlador",
+    "fr": "GL-MC-001P RGB+CCT Mini Contrôleur",
+    "it": "GL-MC-001P RGB+CCT Mini Controller",
+    "no": "GL-MC-001P RGB+CCT Mini Controller",
+    "sv": "GL-MC-001P RGB+CCT Mini Controller",
+    "pl": "GL-MC-001P RGB+CCT Mini Sterownik",
+    "ru": "GL-MC-001P RGB+CCT Мини Контроллер",
+    "ko": "GL-MC-001P RGB+CCT 미니 컨트롤러"
+  },
+  "class": "light",
+  "capabilities": [
+    "onoff",
+    "dim",
+    "light_hue",
+    "light_saturation",
+    "light_temperature",
+    "light_mode"
+  ],
+  "connectivity": [
+    "zigbee"
+  ],
+  "images": {
+    "small": "/drivers/gl-mc-001p/assets/images/small.png",
+    "large": "/drivers/gl-mc-001p/assets/images/large.png",
+    "xlarge": "/drivers/gl-mc-001p/assets/images/xlarge.png"
+  },
+  "platforms": [
+    "local"
+  ],
+  "pair": [
+    {
+      "id": "start",
+      "instruction": {
+        "en": "Reset the device according to the manual and keep it close to Homey during pairing.",
+        "nl": "Reset het apparaat volgens de handleiding en houd het dicht bij Homey tijdens het koppelen."
+      }
+    }
+  ],
+  "zigbee": {
+    "manufacturerName": [
+      "GLEDOPTO"
+    ],
+    "zigbeeModels": [
+      "GL-MC-001P"
+    ]
+  }
+}

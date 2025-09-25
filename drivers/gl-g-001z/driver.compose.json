@@ -1,0 +1,54 @@
+{
+  "id": "gl-g-001z",
+  "name": {
+    "en": "GL-G-001Z RGBW Garden Light",
+    "nl": "GL-G-001Z RGBW Tuin Lamp",
+    "da": "GL-G-001Z RGBW Have Lys",
+    "de": "GL-G-001Z RGBW Gartenleuchte",
+    "es": "GL-G-001Z RGBW Luz de Jardín",
+    "fr": "GL-G-001Z RGBW Lumière Jardin",
+    "it": "GL-G-001Z RGBW Luce da Giardino",
+    "no": "GL-G-001Z RGBW Hage Lys",
+    "sv": "GL-G-001Z RGBW Trädgårdslampa",
+    "pl": "GL-G-001Z RGBW Lampa Ogrodowa",
+    "ru": "GL-G-001Z RGBW Садовый Свет",
+    "ko": "GL-G-001Z RGBW 정원 조명"
+  },
+  "class": "light",
+  "capabilities": [
+    "onoff",
+    "dim",
+    "light_hue",
+    "light_saturation",
+    "light_temperature",
+    "light_mode"
+  ],
+  "connectivity": [
+    "zigbee"
+  ],
+  "images": {
+    "small": "/drivers/gl-g-001z/assets/images/small.png",
+    "large": "/drivers/gl-g-001z/assets/images/large.png",
+    "xlarge": "/drivers/gl-g-001z/assets/images/xlarge.png"
+  },
+  "platforms": [
+    "local"
+  ],
+  "pair": [
+    {
+      "id": "start",
+      "instruction": {
+        "en": "Reset the device according to the manual and keep it close to Homey during pairing.",
+        "nl": "Reset het apparaat volgens de handleiding en houd het dicht bij Homey tijdens het koppelen."
+      }
+    }
+  ],
+  "zigbee": {
+    "manufacturerName": [
+      "GLEDOPTO"
+    ],
+    "zigbeeModels": [
+      "GL-G-001Z"
+    ]
+  }
+}

@@ -1,0 +1,54 @@
+{
+  "id": "gl-b-001zs",
+  "name": {
+    "en": "GL-B-001ZS Candle Bulb E14",
+    "nl": "GL-B-001ZS Candle Bulb E14",
+    "da": "GL-B-001ZS Lyspære E14",
+    "de": "GL-B-001ZS Kerzenlampe E14",
+    "es": "GL-B-001ZS Bombilla Vela E14",
+    "fr": "GL-B-001ZS Ampoule Bougie E14",
+    "it": "GL-B-001ZS Lampadina a Candela E14",
+    "no": "GL-B-001ZS Lysestakepære E14",
+    "sv": "GL-B-001ZS Ljuslampa E14",
+    "pl": "GL-B-001ZS Żarówka Świeczka E14",
+    "ru": "GL-B-001ZS Свечная Лампа E14",
+    "ko": "GL-B-001ZS 촛불 전구 E14"
+  },
+  "class": "light",
+  "capabilities": [
+    "onoff",
+    "dim",
+    "light_hue",
+    "light_saturation",
+    "light_temperature",
+    "light_mode"
+  ],
+  "connectivity": [
+    "zigbee"
+  ],
+  "images": {
+    "small": "/drivers/gl-b-001zs/assets/images/small.png",
+    "large": "/drivers/gl-b-001zs/assets/images/large.png",
+    "xlarge": "/drivers/gl-b-001zs/assets/images/xlarge.png"
+  },
+  "platforms": [
+    "local"
+  ],
+  "pair": [
+    {
+      "id": "start",
+      "instruction": {
+        "en": "Reset the device according to the manual and keep it close to Homey during pairing.",
+        "nl": "Reset het apparaat volgens de handleiding en houd het dicht bij Homey tijdens het koppelen."
+      }
+    }
+  ],
+  "zigbee": {
+    "manufacturerName": [
+      "GLEDOPTO"
+    ],
+    "zigbeeModels": [
+      "GL-B-001ZS"
+    ]
+  }
+}

@@ -1,0 +1,51 @@
+{
+  "id": "gl-s-004z",
+  "name": {
+    "en": "GL-S-004Z WW/CW GU10 Spot",
+    "nl": "GL-S-004Z WW/CW GU10 Spot",
+    "da": "GL-S-004Z WW/CW GU10 Spot",
+    "de": "GL-S-004Z WW/CW GU10 Spot",
+    "es": "GL-S-004Z WW/CW GU10 Spot",
+    "fr": "GL-S-004Z WW/CW GU10 Spot",
+    "it": "GL-S-004Z WW/CW GU10 Spot",
+    "no": "GL-S-004Z WW/CW GU10 Spot",
+    "sv": "GL-S-004Z WW/CW GU10 Spot",
+    "pl": "GL-S-004Z WW/CW GU10 Spot",
+    "ru": "GL-S-004Z WW/CW GU10 Spot",
+    "ko": "GL-S-004Z WW/CW GU10 Spot"
+  },
+  "class": "light",
+  "capabilities": [
+    "onoff",
+    "dim",
+    "light_temperature"
+  ],
+  "connectivity": [
+    "zigbee"
+  ],
+  "images": {
+    "small": "/drivers/gl-s-004z/assets/images/small.png",
+    "large": "/drivers/gl-s-004z/assets/images/large.png",
+    "xlarge": "/drivers/gl-s-004z/assets/images/xlarge.png"
+  },
+  "platforms": [
+    "local"
+  ],
+  "pair": [
+    {
+      "id": "start",
+      "instruction": {
+        "en": "Reset the device according to the manual and keep it close to Homey during pairing.",
+        "nl": "Reset het apparaat volgens de handleiding en houd het dicht bij Homey tijdens het koppelen."
+      }
+    }
+  ],
+  "zigbee": {
+    "manufacturerName": [
+      "GLEDOPTO"
+    ],
+    "zigbeeModels": [
+      "GL-S-004Z"
+    ]
+  }
+}

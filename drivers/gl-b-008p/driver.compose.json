@@ -1,0 +1,54 @@
+{
+  "id": "gl-b-008p",
+  "name": {
+    "en": "GL-B-008P Dual White And Color E27 Bulb",
+    "nl": "GL-B-008P Dual White And Color E27 Bulb",
+    "da": "GL-B-008P Dobbelt hvid og farve E27 pære",
+    "de": "GL-B-008P Dual Weiß und Farbe E27 Glühbirne",
+    "es": "GL-B-008P Doble blanco y color bombilla E27",
+    "fr": "GL-B-008P Double blanc et couleur ampoule E27",
+    "it": "GL-B-008P Bianco e Colore E27 Lampadina",
+    "no": "GL-B-008P Dobbel hvit og farge E27 lyspære",
+    "sv": "GL-B-008P Dubbel vit och färg E27 glödlampa",
+    "pl": "GL-B-008P Podwójna biała i kolorowa żarówka E27",
+    "ru": "GL-B-008P Двойная белая и цветная лампа E27",
+    "ko": "GL-B-008P 듀얼 화이트 앤드 컬러 E27 전구"
+  },
+  "class": "light",
+  "capabilities": [
+    "onoff",
+    "dim",
+    "light_hue",
+    "light_saturation",
+    "light_temperature",
+    "light_mode"
+  ],
+  "connectivity": [
+    "zigbee"
+  ],
+  "images": {
+    "small": "/drivers/gl-b-008p/assets/images/small.png",
+    "large": "/drivers/gl-b-008p/assets/images/large.png",
+    "xlarge": "/drivers/gl-b-008p/assets/images/xlarge.png"
+  },
+  "platforms": [
+    "local"
+  ],
+  "pair": [
+    {
+      "id": "start",
+      "instruction": {
+        "en": "Reset the device according to the manual and keep it close to Homey during pairing.",
+        "nl": "Reset het apparaat volgens de handleiding en houd het dicht bij Homey tijdens het koppelen."
+      }
+    }
+  ],
+  "zigbee": {
+    "manufacturerName": [
+      "GLEDOPTO"
+    ],
+    "zigbeeModels": [
+      "GL-B-008P"
+    ]
+  }
+}

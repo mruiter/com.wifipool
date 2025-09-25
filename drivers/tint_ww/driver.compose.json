@@ -1,0 +1,52 @@
+{
+  "id": "tint_ww",
+  "name": {
+    "en": "Tint WW Bulb",
+    "nl": "Tint WW Bulb",
+    "da": "Tint varm hvid pære",
+    "de": "Tint Warmweiß-Glühbirne",
+    "es": "Tint bombilla blanco cálido",
+    "fr": "Tint ampoule blanc chaud",
+    "it": "Tint lampadina bianco caldo",
+    "no": "Tint varm hvit pære",
+    "sv": "Tint varmvit lampa",
+    "pl": "Tint żarówka ciepła biała",
+    "ru": "Tint лампочка тёплого белого",
+    "ko": "Tint 따뜻한 백색 전구"
+  },
+  "class": "light",
+  "capabilities": [
+    "onoff",
+    "dim",
+    "light_temperature"
+  ],
+  "connectivity": [
+    "zigbee"
+  ],
+  "images": {
+    "small": "/drivers/tint_ww/assets/images/small.png",
+    "large": "/drivers/tint_ww/assets/images/large.png",
+    "xlarge": "/drivers/tint_ww/assets/images/xlarge.png"
+  },
+  "platforms": [
+    "local"
+  ],
+  "pair": [
+    {
+      "id": "start",
+      "instruction": {
+        "en": "Reset the Tint bulb according to the manual and keep it close to Homey during pairing.",
+        "nl": "Reset de Tint-lamp volgens de handleiding en houd deze dicht bij Homey tijdens het koppelen."
+      }
+    }
+  ],
+  "zigbee": {
+    "manufacturerName": [
+      "Müller Licht",
+      "MLI"
+    ],
+    "zigbeeModels": [
+      "ZBT-ColorTemperature"
+    ]
+  }
+}

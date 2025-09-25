@@ -1,0 +1,54 @@
+{
+  "id": "gl-c-008",
+  "name": {
+    "en": "GL-C-008 RGB+CCT Controller (1ID only)",
+    "nl": "GL-C-008 RGB+CCT Controller (1ID only)",
+    "da": "GL-C-008 RGB+CCT Controller (1ID only)",
+    "de": "GL-C-008 RGB+CCT Controller (1ID only)",
+    "es": "GL-C-008 RGB+CCT Controller (1ID only)",
+    "fr": "GL-C-008 RGB+CCT Controller (1ID only)",
+    "it": "GL-C-008 RGB+CCT Controller (1ID only)",
+    "no": "GL-C-008 RGB+CCT Controller (1ID only)",
+    "sv": "GL-C-008 RGB+CCT Controller (1ID only)",
+    "pl": "GL-C-008 RGB+CCT Controller (1ID only)",
+    "ru": "GL-C-008 RGB+CCT Controller (1ID only)",
+    "ko": "GL-C-008 RGB+CCT Controller (1ID only)"
+  },
+  "class": "light",
+  "capabilities": [
+    "onoff",
+    "dim",
+    "light_hue",
+    "light_saturation",
+    "light_temperature",
+    "light_mode"
+  ],
+  "connectivity": [
+    "zigbee"
+  ],
+  "images": {
+    "small": "/drivers/gl-c-008/assets/images/small.png",
+    "large": "/drivers/gl-c-008/assets/images/large.png",
+    "xlarge": "/drivers/gl-c-008/assets/images/xlarge.png"
+  },
+  "platforms": [
+    "local"
+  ],
+  "pair": [
+    {
+      "id": "start",
+      "instruction": {
+        "en": "Reset the device according to the manual and keep it close to Homey during pairing.",
+        "nl": "Reset het apparaat volgens de handleiding en houd het dicht bij Homey tijdens het koppelen."
+      }
+    }
+  ],
+  "zigbee": {
+    "manufacturerName": [
+      "GLEDOPTO"
+    ],
+    "zigbeeModels": [
+      "GL-C-008"
+    ]
+  }
+}

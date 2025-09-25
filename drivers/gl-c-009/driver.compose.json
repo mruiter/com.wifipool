@@ -1,0 +1,50 @@
+{
+  "id": "gl-c-009",
+  "name": {
+    "en": "GL-C-009 LED Dimmer Controller",
+    "nl": "GL-C-009 LED Dimmer Controller",
+    "da": "GL-C-009 LED Dæmper Controller",
+    "de": "GL-C-009 LED-Dimmer-Controller",
+    "es": "Controlador de Atenuación LED GL-C-009",
+    "fr": "Contrôleur de Variateur LED GL-C-009",
+    "it": "Controller Dimmer LED GL-C-009",
+    "no": "GL-C-009 LED Dimmerkontroller",
+    "sv": "GL-C-009 LED-dimmerkontroller",
+    "pl": "Sterownik Ściemniacza LED GL-C-009",
+    "ru": "Контроллер Светодиодного Диммера GL-C-009",
+    "ko": "GL-C-009 LED 디머 컨트롤러"
+  },
+  "class": "light",
+  "capabilities": [
+    "onoff",
+    "dim"
+  ],
+  "connectivity": [
+    "zigbee"
+  ],
+  "images": {
+    "small": "/drivers/gl-c-009/assets/images/small.png",
+    "large": "/drivers/gl-c-009/assets/images/large.png",
+    "xlarge": "/drivers/gl-c-009/assets/images/xlarge.png"
+  },
+  "platforms": [
+    "local"
+  ],
+  "pair": [
+    {
+      "id": "start",
+      "instruction": {
+        "en": "Reset the device according to the manual and keep it close to Homey during pairing.",
+        "nl": "Reset het apparaat volgens de handleiding en houd het dicht bij Homey tijdens het koppelen."
+      }
+    }
+  ],
+  "zigbee": {
+    "manufacturerName": [
+      "GLEDOPTO"
+    ],
+    "zigbeeModels": [
+      "GL-C-009"
+    ]
+  }
+}

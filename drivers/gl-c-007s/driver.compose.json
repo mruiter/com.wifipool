@@ -1,0 +1,54 @@
+{
+  "id": "gl-c-007s",
+  "name": {
+    "en": "GL-C-007S RGBW Controller",
+    "nl": "GL-C-007S RGBW Controller",
+    "da": "GL-C-007S RGBW Controller",
+    "de": "GL-C-007S RGBW Controller",
+    "es": "GL-C-007S RGBW Controller",
+    "fr": "GL-C-007S RGBW Controller",
+    "it": "GL-C-007S RGBW Controller",
+    "no": "GL-C-007S RGBW Controller",
+    "sv": "GL-C-007S RGBW Controller",
+    "pl": "GL-C-007S RGBW Controller",
+    "ru": "GL-C-007S RGBW Controller",
+    "ko": "GL-C-007S RGBW Controller"
+  },
+  "class": "light",
+  "capabilities": [
+    "onoff",
+    "dim",
+    "light_hue",
+    "light_saturation",
+    "light_temperature",
+    "light_mode"
+  ],
+  "connectivity": [
+    "zigbee"
+  ],
+  "images": {
+    "small": "/drivers/gl-c-007s/assets/images/small.png",
+    "large": "/drivers/gl-c-007s/assets/images/large.png",
+    "xlarge": "/drivers/gl-c-007s/assets/images/xlarge.png"
+  },
+  "platforms": [
+    "local"
+  ],
+  "pair": [
+    {
+      "id": "start",
+      "instruction": {
+        "en": "Reset the device according to the manual and keep it close to Homey during pairing.",
+        "nl": "Reset het apparaat volgens de handleiding en houd het dicht bij Homey tijdens het koppelen."
+      }
+    }
+  ],
+  "zigbee": {
+    "manufacturerName": [
+      "GLEDOPTO"
+    ],
+    "zigbeeModels": [
+      "GL-C-007S"
+    ]
+  }
+}

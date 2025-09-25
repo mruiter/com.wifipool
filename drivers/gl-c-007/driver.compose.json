@@ -1,0 +1,54 @@
+{
+  "id": "gl-c-007",
+  "name": {
+    "en": "GL-C-007 RGBW Controller (1ID only)",
+    "nl": "GL-C-007 RGBW Controller (1ID only)",
+    "da": "GL-C-007 RGBW Controller (kun 1ID)",
+    "de": "GL-C-007 RGBW Controller (nur 1ID)",
+    "es": "GL-C-007 Controlador RGBW (solo 1ID)",
+    "fr": "Contrôleur RGBW GL-C-007 (1ID uniquement)",
+    "it": "Controller RGBW GL-C-007 (solo 1ID)",
+    "no": "GL-C-007 RGBW-kontroller (kun 1ID)",
+    "sv": "GL-C-007 RGBW-kontroller (endast 1ID)",
+    "pl": "Kontroler RGBW GL-C-007 (tylko 1ID)",
+    "ru": "Контроллер RGBW GL-C-007 (только 1ID)",
+    "ko": "GL-C-007 RGBW 컨트롤러 (1ID 전용)"
+  },
+  "class": "light",
+  "capabilities": [
+    "onoff",
+    "dim",
+    "light_hue",
+    "light_saturation",
+    "light_temperature",
+    "light_mode"
+  ],
+  "connectivity": [
+    "zigbee"
+  ],
+  "images": {
+    "small": "/drivers/gl-c-007/assets/images/small.png",
+    "large": "/drivers/gl-c-007/assets/images/large.png",
+    "xlarge": "/drivers/gl-c-007/assets/images/xlarge.png"
+  },
+  "platforms": [
+    "local"
+  ],
+  "pair": [
+    {
+      "id": "start",
+      "instruction": {
+        "en": "Reset the device according to the manual and keep it close to Homey during pairing.",
+        "nl": "Reset het apparaat volgens de handleiding en houd het dicht bij Homey tijdens het koppelen."
+      }
+    }
+  ],
+  "zigbee": {
+    "manufacturerName": [
+      "GLEDOPTO"
+    ],
+    "zigbeeModels": [
+      "GL-C-007"
+    ]
+  }
+}

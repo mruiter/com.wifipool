@@ -1,0 +1,54 @@
+{
+  "id": "gl-b-007z",
+  "name": {
+    "en": "GL-B-007Z Dual White And Color E27 Bulb",
+    "nl": "GL-B-007Z Dual White And Color E27 Bulb",
+    "da": "GL-B-007Z Dobbelt Hvid Og Farve E27 Pære",
+    "de": "GL-B-007Z Dual Weiß Und Farbe E27 Birne",
+    "es": "GL-B-007Z Dual Blanco Y Color E27 Bombilla",
+    "fr": "GL-B-007Z Double Blanc Et Couleur E27 Ampoule",
+    "it": "GL-B-007Z Doppio Bianco E Colore E27 Lampadina",
+    "no": "GL-B-007Z Dobbelt Hvit Og Farge E27 Lyspære",
+    "sv": "GL-B-007Z Dubbel Vit Och Färg E27 Glödlampa",
+    "pl": "GL-B-007Z Podwójna Biała I Kolor E27 Żarówka",
+    "ru": "GL-B-007Z Двойной Белый И Цвет E27 Лампа",
+    "ko": "GL-B-007Z 듀얼 화이트 및 컬러 E27 전구"
+  },
+  "class": "light",
+  "capabilities": [
+    "onoff",
+    "dim",
+    "light_hue",
+    "light_saturation",
+    "light_temperature",
+    "light_mode"
+  ],
+  "connectivity": [
+    "zigbee"
+  ],
+  "images": {
+    "small": "/drivers/gl-b-007z/assets/images/small.png",
+    "large": "/drivers/gl-b-007z/assets/images/large.png",
+    "xlarge": "/drivers/gl-b-007z/assets/images/xlarge.png"
+  },
+  "platforms": [
+    "local"
+  ],
+  "pair": [
+    {
+      "id": "start",
+      "instruction": {
+        "en": "Reset the device according to the manual and keep it close to Homey during pairing.",
+        "nl": "Reset het apparaat volgens de handleiding en houd het dicht bij Homey tijdens het koppelen."
+      }
+    }
+  ],
+  "zigbee": {
+    "manufacturerName": [
+      "GLEDOPTO"
+    ],
+    "zigbeeModels": [
+      "GL-B-007Z"
+    ]
+  }
+}

@@ -1,0 +1,55 @@
+{
+  "id": "tint_rgb",
+  "name": {
+    "en": "Tint RGB Bulb",
+    "nl": "Tint RGB Bulb",
+    "da": "Tint RGB-pære",
+    "de": "Tint RGB-Glühbirne",
+    "es": "Bombilla RGB Tint",
+    "fr": "Ampoule RGB Tint",
+    "it": "Lampadina RGB Tint",
+    "no": "Tint RGB-pære",
+    "sv": "Tint RGB-glödlampa",
+    "pl": "Żarówka RGB Tint",
+    "ru": "Лампочка RGB Tint",
+    "ko": "Tint RGB 전구"
+  },
+  "class": "light",
+  "capabilities": [
+    "onoff",
+    "dim",
+    "light_hue",
+    "light_saturation",
+    "light_mode"
+  ],
+  "connectivity": [
+    "zigbee"
+  ],
+  "images": {
+    "small": "/drivers/tint_rgb/assets/images/small.png",
+    "large": "/drivers/tint_rgb/assets/images/large.png",
+    "xlarge": "/drivers/tint_rgb/assets/images/xlarge.png"
+  },
+  "platforms": [
+    "local"
+  ],
+  "pair": [
+    {
+      "id": "start",
+      "instruction": {
+        "en": "Reset the Tint bulb according to the manual and keep it close to Homey during pairing.",
+        "nl": "Reset de Tint-lamp volgens de handleiding en houd deze dicht bij Homey tijdens het koppelen."
+      }
+    }
+  ],
+  "zigbee": {
+    "manufacturerName": [
+      "Müller Licht",
+      "MLI"
+    ],
+    "zigbeeModels": [
+      "ZBT-ExtendedColor",
+      "Bulb white+color"
+    ]
+  }
+}

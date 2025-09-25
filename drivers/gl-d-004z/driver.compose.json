@@ -1,0 +1,54 @@
+{
+  "id": "gl-d-004z",
+  "name": {
+    "en": "GL-D-004Z RGBW/CCT Downlighter",
+    "nl": "GL-D-004Z RGBW/CCT Inbouwspot",
+    "da": "GL-D-004Z RGBW/CCT Downlighter",
+    "de": "GL-D-004Z RGBW/CCT Downlight",
+    "es": "GL-D-004Z RGBW/CCT Downlighter",
+    "fr": "GL-D-004Z RGBW/CCT Downlighter",
+    "it": "GL-D-004Z RGBW/CCT Downlighter",
+    "no": "GL-D-004Z RGBW/CCT Downlighter",
+    "sv": "GL-D-004Z RGBW/CCT Downlighter",
+    "pl": "GL-D-004Z RGBW/CCT Downlighter",
+    "ru": "GL-D-004Z RGBW/CCT Downlighter",
+    "ko": "GL-D-004Z RGBW/CCT 다운라이트"
+  },
+  "class": "light",
+  "capabilities": [
+    "onoff",
+    "dim",
+    "light_hue",
+    "light_saturation",
+    "light_temperature",
+    "light_mode"
+  ],
+  "connectivity": [
+    "zigbee"
+  ],
+  "images": {
+    "small": "/drivers/gl-d-004z/assets/images/small.png",
+    "large": "/drivers/gl-d-004z/assets/images/large.png",
+    "xlarge": "/drivers/gl-d-004z/assets/images/xlarge.png"
+  },
+  "platforms": [
+    "local"
+  ],
+  "pair": [
+    {
+      "id": "start",
+      "instruction": {
+        "en": "Reset the device according to the manual and keep it close to Homey during pairing.",
+        "nl": "Reset het apparaat volgens de handleiding en houd het dicht bij Homey tijdens het koppelen."
+      }
+    }
+  ],
+  "zigbee": {
+    "manufacturerName": [
+      "GLEDOPTO"
+    ],
+    "zigbeeModels": [
+      "GL-D-004Z"
+    ]
+  }
+}

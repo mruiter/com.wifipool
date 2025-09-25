@@ -4,6 +4,7 @@
   "type": "module",
   "license": "MIT",
   "dependencies": {
+    "homey-meshdriver": "^2.0.4",
     "node-fetch": "^3.3.2"
   },
   "scripts": {

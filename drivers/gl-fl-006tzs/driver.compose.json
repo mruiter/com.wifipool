@@ -1,0 +1,54 @@
+{
+  "id": "gl-fl-006tzs",
+  "name": {
+    "en": "GL-FL-006TZS RGB/CCT 60w Floodlight",
+    "nl": "GL-FL-006TZS RGB/CCT 60w Floodlight",
+    "da": "GL-FL-006TZS RGB/CCT 60w Projektør",
+    "de": "GL-FL-006TZS RGB/CCT 60w Flutlicht",
+    "es": "GL-FL-006TZS RGB/CCT 60w Reflector",
+    "fr": "GL-FL-006TZS RGB/CCT 60w Projecteur",
+    "it": "GL-FL-006TZS RGB/CCT 60w Faro",
+    "no": "GL-FL-006TZS RGB/CCT 60w Flomlys",
+    "sv": "GL-FL-006TZS RGB/CCT 60w Strålkastare",
+    "pl": "GL-FL-006TZS RGB/CCT 60w Naświetlacz",
+    "ru": "GL-FL-006TZS RGB/CCT 60w Прожектор",
+    "ko": "GL-FL-006TZS RGB/CCT 60w 투광등"
+  },
+  "class": "light",
+  "capabilities": [
+    "onoff",
+    "dim",
+    "light_hue",
+    "light_saturation",
+    "light_temperature",
+    "light_mode"
+  ],
+  "connectivity": [
+    "zigbee"
+  ],
+  "images": {
+    "small": "/drivers/gl-fl-006tzs/assets/images/small.png",
+    "large": "/drivers/gl-fl-006tzs/assets/images/large.png",
+    "xlarge": "/drivers/gl-fl-006tzs/assets/images/xlarge.png"
+  },
+  "platforms": [
+    "local"
+  ],
+  "pair": [
+    {
+      "id": "start",
+      "instruction": {
+        "en": "Reset the device according to the manual and keep it close to Homey during pairing.",
+        "nl": "Reset het apparaat volgens de handleiding en houd het dicht bij Homey tijdens het koppelen."
+      }
+    }
+  ],
+  "zigbee": {
+    "manufacturerName": [
+      "GLEDOPTO"
+    ],
+    "zigbeeModels": [
+      "GL-FL-006TZS"
+    ]
+  }
+}
