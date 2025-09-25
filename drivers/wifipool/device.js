@@ -29,7 +29,9 @@ export default class WiFiPoolDevice extends Homey.Device {
     this._lastFlowBool = this.getCapabilityValue('alarm_flow') ?? null;
 
     this._switchCapabilityByIo = Object.create(null);
+    this._switchIoByCapability = Object.create(null);
     this._switchLastValues = Object.create(null);
+    this._switchListenerByCap = Object.create(null);
 
     await this._syncSwitchCapabilities();
 
@@ -40,7 +42,10 @@ export default class WiFiPoolDevice extends Homey.Device {
     await this._syncSwitchCapabilities();
     this._startPolling();
   }
-  async onDeleted() { this._stopPolling(); }
+  async onDeleted() {
+    this._stopPolling();
+    await this._clearSwitchCapabilityListeners();
+  }
   async onSettings({ changedKeys }) {
     if (changedKeys.includes('poll_interval')) {
       this.log('[WiFiPool][Device] poll_interval changed → restart polling');
@@ -55,6 +60,7 @@ export default class WiFiPoolDevice extends Homey.Device {
 
     const desired = new Set();
     const mapping = Object.create(null);
+    const reverse = Object.create(null);
 
     for (const io of switches) {
       if (typeof io !== 'string') continue;
@@ -64,9 +70,11 @@ export default class WiFiPoolDevice extends Homey.Device {
       if (!KNOWN_SWITCH_CAPABILITIES.has(capId)) continue;
       desired.add(capId);
       mapping[io] = capId;
+      reverse[capId] = io;
     }
 
     this._switchCapabilityByIo = mapping;
+    this._switchIoByCapability = reverse;
 
     const existing = (this.getCapabilities() || []).filter(cap => /^onoff_[io]\d+$/i.test(cap));
 
@@ -90,6 +98,8 @@ export default class WiFiPoolDevice extends Homey.Device {
         this.error(`[WiFiPool][Device] failed to add capability ${cap}:`, err?.message || err);
       }
     }
+
+    await this._refreshSwitchCapabilityListeners();
   }
 
   async _updateSwitchCapability(io, bool, meta = '') {
@@ -107,6 +117,88 @@ export default class WiFiPoolDevice extends Homey.Device {
     } catch (err) {
       this.error(`[WiFiPool][Device] failed to set ${cap}:`, err?.message || err);
     }
+  }
+
+  async _refreshSwitchCapabilityListeners() {
+    if (!this._switchListenerByCap) this._switchListenerByCap = Object.create(null);
+
+    const desiredCaps = new Set(Object.keys(this._switchIoByCapability || {}));
+
+    for (const [cap, handler] of Object.entries(this._switchListenerByCap)) {
+      if (desiredCaps.has(cap) && this.hasCapability(cap)) continue;
+
+      if (typeof this.unregisterCapabilityListener === 'function') {
+        try {
+          await this.unregisterCapabilityListener(cap, handler);
+        } catch (err) {
+          this.error(`[WiFiPool][Device] failed to unregister capability listener ${cap}:`, err?.message || err);
+        }
+      }
+      delete this._switchListenerByCap[cap];
+    }
+
+    for (const cap of desiredCaps) {
+      if (!this.hasCapability(cap)) continue;
+      if (this._switchListenerByCap[cap]) continue;
+
+      const handler = this._handleSwitchCommand.bind(this, cap);
+      try {
+        await this.registerCapabilityListener(cap, handler);
+        this._switchListenerByCap[cap] = handler;
+        this.log('[WiFiPool][Device] registered capability listener', cap);
+      } catch (err) {
+        this.error(`[WiFiPool][Device] failed to register capability listener ${cap}:`, err?.message || err);
+      }
+    }
+  }
+
+  async _clearSwitchCapabilityListeners() {
+    if (!this._switchListenerByCap) return;
+    for (const [cap, handler] of Object.entries(this._switchListenerByCap)) {
+      if (typeof this.unregisterCapabilityListener === 'function') {
+        try {
+          await this.unregisterCapabilityListener(cap, handler);
+        } catch (err) {
+          this.error(`[WiFiPool][Device] failed to unregister capability listener ${cap}:`, err?.message || err);
+        }
+      }
+    }
+    this._switchListenerByCap = Object.create(null);
+  }
+
+  async _handleSwitchCommand(cap, value) {
+    const io = this._switchIoByCapability?.[cap];
+    if (!io) {
+      this.error('[WiFiPool][Device] capability command for unknown switch', cap);
+      throw new Error('Switch not mapped');
+    }
+
+    const bool = !!value;
+    await this._setManualIO(io, bool);
+
+    this._switchLastValues[cap] = bool;
+    try {
+      await this.setCapabilityValue(cap, bool);
+    } catch (err) {
+      this.error(`[WiFiPool][Device] failed to echo capability ${cap}:`, err?.message || err);
+    }
+  }
+
+  async _setManualIO(io, bool) {
+    const store = this.getStore() || {};
+    const domain = store.domain;
+    if (!domain) throw new Error('Missing domain in device store');
+
+    const cookie = await this._ensureLogin();
+    const body = { domain, io, value: bool ? 1 : 0 };
+
+    const r = await this._httpRequest('POST', '/harmopool/setManualIO', { cookie, body });
+    if (r.status !== 200) {
+      const detail = r.json ? JSON.stringify(r.json) : r.text || '';
+      throw new Error(`setManualIO failed: HTTP ${r.status}${detail ? ` — ${detail}` : ''}`);
+    }
+
+    this.log('[WiFiPool][Device] setManualIO OK →', io, bool);
   }
 
   // ----- Polling -----
