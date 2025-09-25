@@ -557,12 +557,13 @@ export default class WiFiPoolDevice extends Homey.Device {
         const sample = arr[arr.length - 1];
         const ts = Date.parse(sample?.device_sensor_time) || 0;
         if (!this._switchWritableIo) this._switchWritableIo = Object.create(null);
+        const isOutput = /\.o\d+$/i.test(io);
         const hasStateData = sample && sample.device_state_data && typeof sample.device_state_data === 'object' && Object.keys(sample.device_state_data).length > 0;
         const hasSensorData = sample && sample.device_sensor_data && typeof sample.device_sensor_data === 'object' && Object.keys(sample.device_sensor_data).length > 0;
         if (hasStateData && this._switchWritableIo[io] !== true) {
           this._switchWritableIo[io] = true;
           writableChanged = true;
-        } else if (!hasStateData && hasSensorData && this._switchWritableIo[io] !== false) {
+        } else if (!isOutput && !hasStateData && hasSensorData && this._switchWritableIo[io] !== false) {
           this._switchWritableIo[io] = false;
           writableChanged = true;
         }
