@@ -32,6 +32,7 @@ export default class WiFiPoolDevice extends Homey.Device {
     this._switchIoByCapability = Object.create(null);
     this._switchLastValues = Object.create(null);
     this._switchListenerByCap = Object.create(null);
+    this._switchWritableIo = Object.create(null);
 
     await this._syncSwitchCapabilities();
 
@@ -61,6 +62,7 @@ export default class WiFiPoolDevice extends Homey.Device {
     const desired = new Set();
     const mapping = Object.create(null);
     const reverse = Object.create(null);
+    const writable = Object.create(null);
 
     for (const io of switches) {
       if (typeof io !== 'string') continue;
@@ -71,10 +73,13 @@ export default class WiFiPoolDevice extends Homey.Device {
       desired.add(capId);
       mapping[io] = capId;
       reverse[capId] = io;
+      const prev = this._switchWritableIo?.[io];
+      writable[io] = prev == null ? (/\.i\d+$/i.test(io)) : !!prev;
     }
 
     this._switchCapabilityByIo = mapping;
     this._switchIoByCapability = reverse;
+    this._switchWritableIo = writable;
 
     const existing = (this.getCapabilities() || []).filter(cap => /^onoff_[io]\d+$/i.test(cap));
 
@@ -126,7 +131,7 @@ export default class WiFiPoolDevice extends Homey.Device {
 
     for (const [cap, handler] of Object.entries(this._switchListenerByCap)) {
       const io = this._switchIoByCapability?.[cap] || '';
-      const isWritable = /\.(?:i|o)\d+$/i.test(io);
+      const isWritable = this._isSwitchWritable(io);
       const keepListener = desiredCaps.has(cap) && this.hasCapability(cap) && isWritable;
       if (keepListener) continue;
 
@@ -144,7 +149,7 @@ export default class WiFiPoolDevice extends Homey.Device {
       if (!this.hasCapability(cap)) continue;
 
       const io = this._switchIoByCapability?.[cap] || '';
-      const isWritable = /\.(?:i|o)\d+$/i.test(io);
+      const isWritable = this._isSwitchWritable(io);
 
       try {
         if (typeof this.setCapabilityOptions === 'function') {
@@ -195,7 +200,7 @@ export default class WiFiPoolDevice extends Homey.Device {
       throw new Error('Switch not mapped');
     }
 
-    if (!/\.(?:i|o)\d+$/i.test(io)) {
+    if (!this._isSwitchWritable(io)) {
       this.error('[WiFiPool][Device] capability command for read-only sensor', cap, io);
       throw new Error('Switch is read-only');
     }
@@ -217,6 +222,10 @@ export default class WiFiPoolDevice extends Homey.Device {
     if (!domain) throw new Error('Missing domain in device store');
 
     if (!/\.(?:i|o)\d+$/i.test(io || '')) {
+      throw new Error('Invalid IO identifier');
+    }
+
+    if (!this._isSwitchWritable(io)) {
       throw new Error('Cannot control sensor IO');
     }
 
@@ -226,10 +235,27 @@ export default class WiFiPoolDevice extends Homey.Device {
     const r = await this._httpRequest('POST', '/harmopool/setManualIO', { cookie, body });
     if (r.status !== 200) {
       const detail = r.json ? JSON.stringify(r.json) : r.text || '';
+      if (r.status === 403 && /setManualIO on sensors/i.test(detail)) {
+        if (this._switchWritableIo && this._switchWritableIo[io] !== false) {
+          this._switchWritableIo[io] = false;
+          await this._refreshSwitchCapabilityListeners();
+        }
+      }
       throw new Error(`setManualIO failed: HTTP ${r.status}${detail ? ` — ${detail}` : ''}`);
     }
 
+    if (this._switchWritableIo && this._switchWritableIo[io] !== true) {
+      this._switchWritableIo[io] = true;
+      await this._refreshSwitchCapabilityListeners();
+    }
+
     this.log('[WiFiPool][Device] setManualIO OK →', io, bool);
+  }
+
+  _isSwitchWritable(io) {
+    if (!io) return false;
+    if (!this._switchWritableIo) return false;
+    return this._switchWritableIo[io] === true;
   }
 
   // ----- Polling -----
@@ -508,6 +534,8 @@ export default class WiFiPoolDevice extends Homey.Device {
 
     const results = [];
 
+    let writableChanged = false;
+
     const scan = async (list, label) => {
       for (const io of list) {
         // Force after=0 for switch/relay to always get latest toggle
@@ -518,6 +546,16 @@ export default class WiFiPoolDevice extends Homey.Device {
         }
         const sample = arr[arr.length - 1];
         const ts = Date.parse(sample?.device_sensor_time) || 0;
+        if (!this._switchWritableIo) this._switchWritableIo = Object.create(null);
+        const hasStateData = sample && sample.device_state_data && typeof sample.device_state_data === 'object' && Object.keys(sample.device_state_data).length > 0;
+        const hasSensorData = sample && sample.device_sensor_data && typeof sample.device_sensor_data === 'object' && Object.keys(sample.device_sensor_data).length > 0;
+        if (hasStateData && this._switchWritableIo[io] !== true) {
+          this._switchWritableIo[io] = true;
+          writableChanged = true;
+        } else if (!hasStateData && hasSensorData && this._switchWritableIo[io] !== false) {
+          this._switchWritableIo[io] = false;
+          writableChanged = true;
+        }
         const { bool, via } = this._decodeSwitchBool(sample);
         this.log(`[WiFiPool][Device] flow(${label}) io=${io} via=${via} bool=${bool} newest=${ts ? new Date(ts).toISOString() : 'n/a'}`);
         try {
@@ -533,6 +571,10 @@ export default class WiFiPoolDevice extends Homey.Device {
 
     if (outputs.length) await scan(outputs, 'out');
     if (inputs.length) await scan(inputs, 'in');
+
+    if (writableChanged) {
+      await this._refreshSwitchCapabilityListeners();
+    }
 
     if (results.length) {
       const first = results[0];
