@@ -5,10 +5,6 @@ import fetch from 'node-fetch';
 const BASE = 'https://api.wifipool.eu/native_mobile';
 const STALE_MS = 5 * 60 * 1000;          // 5 minutes for pH/ORP/Temp
 const FLOW_ANALOG_THRESHOLD = 0.5;       // abs(analog) >= threshold => flow=true
-const KNOWN_SWITCH_CAPABILITIES = new Set([
-  'onoff_i0', 'onoff_i1', 'onoff_i2', 'onoff_i3',
-  'onoff_o0', 'onoff_o1', 'onoff_o2', 'onoff_o3'
-]);
 
 export default class WiFiPoolDevice extends Homey.Device {
   async onInit() {
@@ -28,321 +24,16 @@ export default class WiFiPoolDevice extends Homey.Device {
     // remember last published flow to avoid redundant writes
     this._lastFlowBool = this.getCapabilityValue('alarm_flow') ?? null;
 
-    this._switchCapabilityByIo = Object.create(null);
-    this._switchIoByCapability = Object.create(null);
-    this._switchLastValues = Object.create(null);
-    this._switchListenerByCap = Object.create(null);
-    this._switchWritableIo = Object.create(null);
-    this._switchPairByIo = Object.create(null);
-
-    await this._syncSwitchCapabilities();
-
     this._startPolling();
   }
 
-  async onAdded() {
-    await this._syncSwitchCapabilities();
-    this._startPolling();
-  }
-  async onDeleted() {
-    this._stopPolling();
-    await this._clearSwitchCapabilityListeners();
-  }
+  async onAdded() { this._startPolling(); }
+  async onDeleted() { this._stopPolling(); }
   async onSettings({ changedKeys }) {
     if (changedKeys.includes('poll_interval')) {
       this.log('[WiFiPool][Device] poll_interval changed → restart polling');
       await this._restartPolling();
     }
-  }
-
-  async _syncSwitchCapabilities() {
-    const store = this.getStore() || {};
-    const io_map = store.io_map || {};
-    const switches = Array.isArray(io_map.switches) ? io_map.switches : [];
-
-    const desired = new Set();
-    const mapping = Object.create(null);
-    const reverse = Object.create(null);
-    const writable = Object.create(null);
-    const pairByKey = Object.create(null);
-
-    for (const io of switches) {
-      if (typeof io !== 'string') continue;
-      const match = io.match(/\.((?:i|o)\d+)$/i);
-      if (!match) continue;
-      const capId = `onoff_${match[1].toLowerCase()}`;
-      if (!KNOWN_SWITCH_CAPABILITIES.has(capId)) continue;
-      desired.add(capId);
-      mapping[io] = capId;
-      reverse[capId] = io;
-      const prev = this._switchWritableIo?.[io];
-      writable[io] = prev == null ? (/\.o\d+$/i.test(io)) : !!prev;
-
-      const matchDetail = io.match(/^(.+)\.([io])(\d+)$/i);
-      if (matchDetail) {
-        const [, deviceId, type, idx] = matchDetail;
-        const key = `${deviceId.toLowerCase()}#${idx}`;
-        const entry = pairByKey[key] || (pairByKey[key] = { manual: null, power: null });
-        if (type.toLowerCase() === 'o') entry.manual = io;
-        else entry.power = io;
-      }
-    }
-
-    this._switchCapabilityByIo = mapping;
-    this._switchIoByCapability = reverse;
-
-    for (const entry of Object.values(pairByKey)) {
-      if (!entry || !entry.manual || !entry.power) continue;
-
-      // When the API exposes both a manual relay (".oX") and the
-      // corresponding power sensor (".iX"), toggling either of them from the
-      // Homey UI should behave the same.  We already know that the manual
-      // output is writable, so mark the paired input as writable as well (so
-      // long as we have not explicitly learned that it is read-only).
-      if (writable[entry.manual] !== false && writable[entry.power] !== false) {
-        writable[entry.power] = true;
-      }
-    }
-
-    this._switchWritableIo = writable;
-    const pairByIo = Object.create(null);
-    for (const entry of Object.values(pairByKey)) {
-      if (entry.manual) pairByIo[entry.manual] = entry;
-      if (entry.power) pairByIo[entry.power] = entry;
-    }
-    this._switchPairByIo = pairByIo;
-
-    const existing = (this.getCapabilities() || []).filter(cap => /^onoff_[io]\d+$/i.test(cap));
-
-    for (const cap of existing) {
-      if (desired.has(cap)) continue;
-      try {
-        await this.removeCapability(cap);
-        delete this._switchLastValues[cap];
-        this.log('[WiFiPool][Device] removed switch capability', cap);
-      } catch (err) {
-        this.error(`[WiFiPool][Device] failed to remove capability ${cap}:`, err?.message || err);
-      }
-    }
-
-    for (const cap of desired) {
-      if (this.hasCapability(cap)) continue;
-      try {
-        await this.addCapability(cap);
-        this.log('[WiFiPool][Device] added switch capability', cap);
-      } catch (err) {
-        this.error(`[WiFiPool][Device] failed to add capability ${cap}:`, err?.message || err);
-      }
-    }
-
-    await this._refreshSwitchCapabilityListeners();
-  }
-
-  async _updateSwitchCapability(io, bool, meta = '') {
-    if (bool == null) return;
-    const cap = this._switchCapabilityByIo?.[io];
-    if (!cap || !this.hasCapability(cap)) return;
-
-    const value = !!bool;
-    if (this._switchLastValues[cap] === value) return;
-
-    this._switchLastValues[cap] = value;
-    try {
-      await this.setCapabilityValue(cap, value);
-      this.log('[WiFiPool][Device] switch updated →', cap, value, meta);
-    } catch (err) {
-      this.error(`[WiFiPool][Device] failed to set ${cap}:`, err?.message || err);
-    }
-  }
-
-  async _refreshSwitchCapabilityListeners() {
-    if (!this._switchListenerByCap) this._switchListenerByCap = Object.create(null);
-
-    const desiredCaps = new Set(Object.keys(this._switchIoByCapability || {}));
-
-    for (const [cap, handler] of Object.entries(this._switchListenerByCap)) {
-      const io = this._switchIoByCapability?.[cap] || '';
-      const isWritable = this._isSwitchWritable(io);
-      const keepListener = desiredCaps.has(cap) && this.hasCapability(cap) && isWritable;
-      if (keepListener) continue;
-
-      if (typeof this.unregisterCapabilityListener === 'function') {
-        try {
-          await this.unregisterCapabilityListener(cap, handler);
-        } catch (err) {
-          this.error(`[WiFiPool][Device] failed to unregister capability listener ${cap}:`, err?.message || err);
-        }
-      }
-      delete this._switchListenerByCap[cap];
-    }
-
-    for (const cap of desiredCaps) {
-      if (!this.hasCapability(cap)) continue;
-
-      const io = this._switchIoByCapability?.[cap] || '';
-      const isWritable = this._isSwitchWritable(io);
-
-      try {
-        if (typeof this.setCapabilityOptions === 'function') {
-          const existing = typeof this.getCapabilityOptions === 'function'
-            ? this.getCapabilityOptions(cap) || {}
-            : {};
-          if (existing.setable !== isWritable) {
-            await this.setCapabilityOptions(cap, { ...existing, setable: isWritable });
-          }
-        }
-      } catch (err) {
-        this.error(`[WiFiPool][Device] failed to set capability options ${cap}:`, err?.message || err);
-      }
-
-      if (!isWritable) continue;
-
-      if (this._switchListenerByCap[cap]) continue;
-
-      const handler = this._handleSwitchCommand.bind(this, cap);
-      try {
-        await this.registerCapabilityListener(cap, handler);
-        this._switchListenerByCap[cap] = handler;
-        this.log('[WiFiPool][Device] registered capability listener', cap);
-      } catch (err) {
-        this.error(`[WiFiPool][Device] failed to register capability listener ${cap}:`, err?.message || err);
-      }
-    }
-  }
-
-  async _clearSwitchCapabilityListeners() {
-    if (!this._switchListenerByCap) return;
-    for (const [cap, handler] of Object.entries(this._switchListenerByCap)) {
-      if (typeof this.unregisterCapabilityListener === 'function') {
-        try {
-          await this.unregisterCapabilityListener(cap, handler);
-        } catch (err) {
-          this.error(`[WiFiPool][Device] failed to unregister capability listener ${cap}:`, err?.message || err);
-        }
-      }
-    }
-    this._switchListenerByCap = Object.create(null);
-  }
-
-  async _handleSwitchCommand(cap, value) {
-    const io = this._switchIoByCapability?.[cap];
-    if (!io) {
-      this.error('[WiFiPool][Device] capability command for unknown switch', cap);
-      throw new Error('Switch not mapped');
-    }
-
-    if (!this._isSwitchWritable(io)) {
-      this.error('[WiFiPool][Device] capability command for read-only sensor', cap, io);
-      throw new Error('Switch is read-only');
-    }
-
-    const bool = !!value;
-
-    const pair = this._switchPairByIo?.[io] || null;
-    const manualIo = pair?.manual || (/\.o\d+$/i.test(io) ? io : null);
-    const powerIo = pair?.power || (/\.i\d+$/i.test(io) ? io : null);
-
-    const commands = [];
-    const isOutputIo = ioId => /\.o\d+$/i.test(ioId || '');
-
-    if (bool) {
-      if (manualIo) commands.push({ io: manualIo, target: true, options: {} });
-      if (powerIo && powerIo !== manualIo && isOutputIo(powerIo)) {
-        commands.push({ io: powerIo, target: true, options: { skipWritableCheck: true, markWritable: false } });
-      }
-    } else {
-      if (powerIo && isOutputIo(powerIo)) {
-        commands.push({ io: powerIo, target: false, options: { skipWritableCheck: manualIo !== powerIo, markWritable: false } });
-      }
-      if (manualIo && manualIo !== powerIo) {
-        commands.push({ io: manualIo, target: false, options: {} });
-      }
-    }
-
-    const seen = new Set();
-    for (const cmd of commands) {
-      if (!cmd.io || seen.has(cmd.io)) continue;
-      await this._setManualIO(cmd.io, cmd.target, cmd.options);
-      seen.add(cmd.io);
-    }
-
-    if (!commands.length) {
-      await this._setManualIO(io, bool, { skipWritableCheck: false });
-    }
-
-    this._switchLastValues[cap] = bool;
-    try {
-      await this.setCapabilityValue(cap, bool);
-    } catch (err) {
-      this.error(`[WiFiPool][Device] failed to echo capability ${cap}:`, err?.message || err);
-    }
-
-    const updateIos = new Set();
-    if (manualIo) updateIos.add(manualIo);
-    if (powerIo) updateIos.add(powerIo);
-    updateIos.delete(io);
-
-    for (const targetIo of updateIos) {
-      try {
-        await this._updateSwitchCapability(targetIo, bool, '(command echo)');
-      } catch (err) {
-        this.error(`[WiFiPool][Device] failed to update paired capability for ${targetIo}:`, err?.message || err);
-      }
-    }
-  }
-
-  async _setManualIO(io, bool, options = {}) {
-    const store = this.getStore() || {};
-    const domain = store.domain;
-    if (!domain) throw new Error('Missing domain in device store');
-
-    if (!/\.(?:i|o)\d+$/i.test(io || '')) {
-      throw new Error('Invalid IO identifier');
-    }
-
-    const { skipWritableCheck = false, markWritable = true } = options;
-
-    if (!skipWritableCheck && !this._isSwitchWritable(io)) {
-      throw new Error('Cannot control sensor IO');
-    }
-
-    const cookie = await this._ensureLogin();
-    const body = { domain, io, value: bool ? 1 : 0 };
-
-    const r = await this._httpRequest('POST', '/harmopool/setManualIO', { cookie, body });
-    if (r.status !== 200) {
-      const detail = r.json ? JSON.stringify(r.json) : r.text || '';
-      if (r.status === 403 && /setManualIO on sensors/i.test(detail)) {
-        if (this._switchWritableIo && this._switchWritableIo[io] !== false) {
-          this._switchWritableIo[io] = false;
-          await this._refreshSwitchCapabilityListeners();
-        }
-      }
-      throw new Error(`setManualIO failed: HTTP ${r.status}${detail ? ` — ${detail}` : ''}`);
-    }
-
-    if (markWritable && this._switchWritableIo && this._switchWritableIo[io] !== true) {
-      this._switchWritableIo[io] = true;
-      await this._refreshSwitchCapabilityListeners();
-    }
-
-    this.log('[WiFiPool][Device] setManualIO OK →', io, bool);
-  }
-
-  _isSwitchWritable(io) {
-    if (!io) return false;
-
-    // First prefer explicit knowledge about IO writability gathered from
-    // previous API calls. When we have seen a successful `setManualIO` we mark
-    // the IO as writable, and when the API rejects the call we mark it as
-    // read-only.  However, on a fresh boot/pairing we might not have any
-    // information stored yet, so fall back to the IO naming convention: all
-    // outputs (`.oX`) are writable, inputs (`.iX`) are not.
-    if (this._switchWritableIo && io in this._switchWritableIo) {
-      return this._switchWritableIo[io] === true;
-    }
-
-    return /\.o\d+$/i.test(io);
   }
 
   // ----- Polling -----
@@ -619,10 +310,6 @@ export default class WiFiPoolDevice extends Homey.Device {
       if (sample) this.log('[WiFiPool][Device] flow sample :=', JSON.stringify(sample));
     };
 
-    const results = [];
-
-    let writableChanged = false;
-
     const scan = async (list, label) => {
       for (const io of list) {
         // Force after=0 for switch/relay to always get latest toggle
@@ -633,40 +320,23 @@ export default class WiFiPoolDevice extends Homey.Device {
         }
         const sample = arr[arr.length - 1];
         const ts = Date.parse(sample?.device_sensor_time) || 0;
-        if (!this._switchWritableIo) this._switchWritableIo = Object.create(null);
-        const isOutput = /\.o\d+$/i.test(io);
-        const hasStateData = sample && sample.device_state_data && typeof sample.device_state_data === 'object' && Object.keys(sample.device_state_data).length > 0;
-        const hasSensorData = sample && sample.device_sensor_data && typeof sample.device_sensor_data === 'object' && Object.keys(sample.device_sensor_data).length > 0;
-        if (hasStateData && this._switchWritableIo[io] !== true) {
-          this._switchWritableIo[io] = true;
-          writableChanged = true;
-        } else if (!isOutput && !hasStateData && hasSensorData && this._switchWritableIo[io] !== false) {
-          this._switchWritableIo[io] = false;
-          writableChanged = true;
-        }
         const { bool, via } = this._decodeSwitchBool(sample);
         this.log(`[WiFiPool][Device] flow(${label}) io=${io} via=${via} bool=${bool} newest=${ts ? new Date(ts).toISOString() : 'n/a'}`);
-        try {
-          await this._updateSwitchCapability(io, bool, `(via ${via}${ts ? ` @ ${new Date(ts).toISOString()}` : ''})`);
-        } catch (err) {
-          this.error('[WiFiPool][Device] update switch capability error:', err?.message || err);
-        }
-        if (bool !== null) {
-          results.push({ bool, io, sample });
-        }
+        if (bool !== null) return { bool, io, sample };
       }
+      return null;
     };
 
-    if (outputs.length) await scan(outputs, 'out');
-    if (inputs.length) await scan(inputs, 'in');
-
-    if (writableChanged) {
-      await this._refreshSwitchCapabilityListeners();
+    // 1) Try outputs
+    if (outputs.length) {
+      const res = await scan(outputs, 'out');
+      if (res) return publish(res.bool, `(output ${res.io})`, res.sample);
     }
 
-    if (results.length) {
-      const first = results[0];
-      return publish(first.bool, `(switch ${first.io})`, first.sample);
+    // 2) Try inputs
+    if (inputs.length) {
+      const res = await scan(inputs, 'in');
+      if (res) return publish(res.bool, `(input ${res.io})`, res.sample);
     }
 
     // 3) Fallback to analog if mapped
