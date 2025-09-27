@@ -169,7 +169,7 @@
       "path": "/test"
     }
   },
-  "esm": true,
+  "esm": false,
   "flow": {
     "triggers": [
       {

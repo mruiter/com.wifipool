@@ -169,5 +169,5 @@
       "path": "/test"
     }
   },
-  "esm": true
+  "esm": false
 }

@@ -1,12 +1,12 @@
-// drivers/wifipool/device.js — Homey SDK v3 (ESM)
-import Homey from 'homey';
-import fetch from 'node-fetch';
+// drivers/wifipool/device.js — Homey SDK v3 (CommonJS)
+const Homey = require('homey');
+const fetch = require('../../lib/fetch');
 
 const BASE = 'https://api.wifipool.eu/native_mobile';
 const STALE_MS = 5 * 60 * 1000;          // 5 minutes for pH/ORP/Temp
 const FLOW_ANALOG_THRESHOLD = 0.5;       // abs(analog) >= threshold => flow=true
 
-export default class WiFiPoolDevice extends Homey.Device {
+class WiFiPoolDevice extends Homey.Device {
   async onInit() {
     this.log('[WiFiPool][Device] init:', this.getName());
 
@@ -352,3 +352,5 @@ export default class WiFiPoolDevice extends Homey.Device {
     this.log('[WiFiPool][Device] flow: no conclusive evidence this round');
   }
 }
+
+module.exports = WiFiPoolDevice;

@@ -1,6 +1,6 @@
-// drivers/wifipool/driver.js — Homey SDK v3 (ESM)
-import Homey from 'homey';
-import fetch from 'node-fetch';
+// drivers/wifipool/driver.js — Homey SDK v3 (CommonJS)
+const Homey = require('homey');
+const fetch = require('../../lib/fetch');
 
 const BASE = 'https://api.wifipool.eu/native_mobile';
 let REQ = 0;
@@ -294,7 +294,7 @@ async function autoDiscover(driver, { email, password }) {
 }
 
 // ---------- Driver ----------
-export default class WiFiPoolDriver extends Homey.Driver {
+class WiFiPoolDriver extends Homey.Driver {
   async onInit() {
     this.log('[WiFiPool][Driver] init');
   }
@@ -340,3 +340,5 @@ export default class WiFiPoolDriver extends Homey.Driver {
     return [];
   }
 }
+
+module.exports = WiFiPoolDriver;
