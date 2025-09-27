@@ -2,13 +2,10 @@
 // Minimal sanity checks for the Homey WiFiPool app.
 // Run with: npm test
 
-import { strict as assert } from 'node:assert';
-import fs from 'node:fs/promises';
-import path from 'node:path';
-import { fileURLToPath, pathToFileURL } from 'node:url';
+const assert = require('assert').strict;
+const fs = require('fs/promises');
+const path = require('path');
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 const ROOT = __dirname;
 
 const errors = [];
@@ -27,10 +24,11 @@ async function readJson(relPath) {
 async function checkApiModule() {
   const apiPath = path.join(ROOT, 'api.js');
   try {
-    const mod = await import(pathToFileURL(apiPath).href);
-    assert.ok(mod && typeof mod.default === 'object', 'api.js default export should be an object');
+    // eslint-disable-next-line global-require, import/no-dynamic-require
+    const handlers = require(apiPath);
+    assert.ok(handlers && typeof handlers === 'object', 'api.js should export an object');
     for (const fn of ['testApi', 'discoverIos', 'autoSetup']) {
-      assert.equal(typeof mod.default[fn], 'function', `api.js default export is missing function '${fn}'`);
+      assert.equal(typeof handlers[fn], 'function', `api.js export is missing function '${fn}'`);
     }
   } catch (e) {
     errors.push(`api.js import/shape failed: ${e.message}`);

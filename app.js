@@ -1,5 +1,5 @@
-import Homey from 'homey';
-import apiHandlers from './api.js';
+const Homey = require('homey');
+const apiHandlers = require('./api');
 
 const API_DEFINITIONS = [
   { id: 'testApi', method: 'POST', path: '/test' },
@@ -7,7 +7,7 @@ const API_DEFINITIONS = [
   { id: 'autoSetup', method: 'POST', path: '/autosetup' },
 ];
 
-export default class WiFiPoolApp extends Homey.App {
+class WiFiPoolApp extends Homey.App {
   async onInit() {
     this.log('[WiFiPool][App] init');
 
@@ -126,3 +126,5 @@ export default class WiFiPoolApp extends Homey.App {
     }
   }
 }
+
+module.exports = WiFiPoolApp;
