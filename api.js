@@ -1,4 +1,4 @@
-// api.js — Homey SDK v3 (ESM)
+// api.js — Homey SDK v3 (CommonJS)
 // Endpoints (must match app.json "api" section):
 //   - testApi      (POST /test)
 //   - discoverIos  (POST /discover)
@@ -12,9 +12,9 @@
   { "id": "autoSetup",   "path": "/autosetup", "method": "POST", "public": false }
 ]
 */
-// package.json: { "type": "module", "dependencies": { "node-fetch": "^3.3.2" } }
+// package.json: { "dependencies": { "node-fetch": "^3.3.2" } }
 
-import fetch from 'node-fetch';
+const fetch = require('./lib/fetch');
 
 const BASE = 'https://api.wifipool.eu/native_mobile';
 let REQ = 0;
@@ -263,7 +263,7 @@ function detectFromStats(arr) {
 }
 
 // ----- Auto-setup core flow -----
-export async function autoSetupCore(homey) {
+async function autoSetupCore(homey) {
   // 1) login
   const { cookie, user } = await login(homey);
   const loginUserId = user?.mobile_user_id;
@@ -335,7 +335,7 @@ export async function autoSetupCore(homey) {
 }
 
 // ----- Exported API (default export required by ManagerApi) -----
-export default {
+const apiHandlers = {
   // Quick connectivity check
   async testApi({ homey }) {
     const { cookie, user } = await login(homey);
@@ -360,4 +360,9 @@ export default {
     const result = await autoSetupCore(homey);
     return { ok: true, ...result };
   },
+};
+
+module.exports = {
+  ...apiHandlers,
+  autoSetupCore,
 };
