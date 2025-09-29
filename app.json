@@ -37,7 +37,7 @@
   "compatibility": ">=12.0.1",
   "sdk": 3,
   "brandColor": "#0b5ea8",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "author": {
     "name": "Marco Ruiter",
     "email": "mruiter@eslaan24.nl"

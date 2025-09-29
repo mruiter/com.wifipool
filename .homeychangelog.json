@@ -16,5 +16,8 @@
   },
   "1.0.5": {
     "en": "Switched back to CommonJS . 2019/2023 don't have the same NodeJS version. ESM is not the way to go on the Homey"
+  },
+  "1.0.6": {
+    "en": "Removed API rights"
   }
 }
